@@ -1,6 +1,7 @@
 #include "animationPart.h"
 #include "keyImage.h"
 #include <algorithm>
+#include <iostream>
 
 void AnimationPart::draw(float x, float y, float time, sf::Sprite& spr,sf::RenderWindow& screen)
 {
@@ -18,6 +19,7 @@ void AnimationPart::draw(float x, float y, float time, sf::Sprite& spr,sf::Rende
 			right=true;
 			break;
 		}
+		pos++;
 	}
 	if (not right)
 	{
@@ -35,7 +37,6 @@ void AnimationPart::draw(float x, float y, float time, sf::Sprite& spr,sf::Rende
 }
 bool AnimationPart::solveKeyImage()
 {
-	std::sort(keyimages.begin(),keyimages.end());
 
 	float time=-1.0;
 	int i;
@@ -45,20 +46,24 @@ bool AnimationPart::solveKeyImage()
 	{
 		if (keyimages[i].time==time)
 		{
-			keyimages[j].combine(keyimages[i]);
+			keyimages[j].combine(keyimages[i],KeyImage::All);
 			keyimages.erase(keyimages.begin()+i);
-			i--;
 			n=keyimages.size();
+			i=j;
 		}
-		else j=i;
+		else
+		{
+			j=i;
+			time=keyimages[i].time;
+		}
 	}
 
+	n=keyimages.size();
 	for(int i=0;i<n;++i)
 	{
-		for(int attribute=1;attribute<=DEFINEDMASKLAST;attribute<<1)
+		for(int attribute=1;attribute<=DEFINEDMASKLAST;attribute<<=1)
 		{
-			
-			if (not (keyimages[i].definedMask|attribute))
+			if (not (keyimages[i].definedMask&attribute))
 			{
 				KeyImage addition;
 				bool left=false;
@@ -69,7 +74,7 @@ bool AnimationPart::solveKeyImage()
 				{
 					posleft--;
 					if (posleft<0) break;
-					if (keyimages[i].definedMask|attribute)
+					if (keyimages[posleft].definedMask&attribute)
 					{
 						left=true;
 						break;
@@ -79,17 +84,18 @@ bool AnimationPart::solveKeyImage()
 				{
 					posright++;
 					if (posright>=n) break;
-					if (keyimages[i].definedMask|attribute)
+					if (keyimages[posright].definedMask&attribute)
 					{
-						left=true;
+						right=true;
 						break;
 					}
 				}
+				using namespace std;
 				if (left and right)
 				{
 					addition=keyimages[posleft];
 					float t=keyimages[i].time;
-					addition.interpolateWith(t,keyimages[posright]);
+					addition=addition.interpolateWith(t,keyimages[posright]);
 				}
 				else if (left)
 				{
@@ -99,7 +105,7 @@ bool AnimationPart::solveKeyImage()
 				{
 					addition=keyimages[posright];
 				}
-				keyimages[i].combine(addition);
+				keyimages[i].combine(addition,attribute);
 			}
 		}
 	}
