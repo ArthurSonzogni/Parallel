@@ -5,7 +5,6 @@
 
 void AnimationPart::draw(float x, float y, float time, sf::Sprite& spr,sf::RenderWindow& screen)
 {
-	bool left=false;
 	bool right=false;
 	int n=keyimages.size();
 	if (n==0) return;
