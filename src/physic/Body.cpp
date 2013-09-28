@@ -36,7 +36,7 @@ AABB Body::getAABB()
 
 #include <iostream>
 using namespace std;
-Collision Body::isColliding(Body& other)
+Collision Body::isColliding(Body& other, bool testOther)
 {
 	int nbEdge=pointList.size();
 	int nbEdgeOther=other.pointList.size();
@@ -90,7 +90,8 @@ Collision Body::isColliding(Body& other)
 	}
 	else
 	{
-		return Collision();	
+		if (testOther) return other.isColliding(*this,false);
+		else return Collision();	
 	}
 }
 

@@ -14,7 +14,8 @@ class Body
 	public:
 		Body();
 		AABB getAABB();
-		Collision isColliding(Body& other);
+		Collision isColliding(Body& other,bool testOther);
+
 		void addPoint(Vecteur v);
 	private:
 

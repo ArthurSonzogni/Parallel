@@ -8,8 +8,6 @@ using namespace std;
 
 int main(int argc, const char *argv[])
 {
-	if (true)
-	{
 		Body a,b;
 		a.addPoint(Vecteur(0.0,0.0));
 		a.addPoint(Vecteur(1.0,0.0));
@@ -20,12 +18,9 @@ int main(int argc, const char *argv[])
 		b.addPoint(Vecteur(1.5,0.0));
 		b.addPoint(Vecteur(2.0,0.5));
 		b.addPoint(Vecteur(1.5,1.0));
-
-		Collision c=a.isColliding(b);
-		cout<<c.direction.x<<","<<c.direction.y<<endl;
-		cout<<"---"<<endl;
-		Collision d=b.isColliding(a);
-		cout<<d.direction.x<<","<<d.direction.y<<endl;
+	for(int i=0;i<100000;i++)
+	{
+		Collision c=a.isColliding(b,true);
 	}
 	if (false)
 	{
