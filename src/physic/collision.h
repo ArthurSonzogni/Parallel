@@ -7,6 +7,7 @@ class Collision
 	public:
 		Collision();
 		bool isCollision;
+		double penetration;
 		Vecteur direction;
 		Vecteur position;
 };

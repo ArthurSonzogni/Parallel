@@ -2,19 +2,29 @@
 #define BROADPHASE_SEI59BZF
 
 #include <vector>
+#include <set>
 #include "AABB.h"
 #include "Body.h"
+#include <SFML/Graphics.hpp>
+
+using BroadPhaseInput = std::vector<Body*>;
+using BroadPhaseInputInt = std::vector<int>;
+using BroadPhaseOuputInt = std::vector<std::vector<int> >;
+using BroadPhaseOuput = std::set<std::pair<int,int> >;
 
 class BroadPhase
 {
 	public:
-		BroadPhase(std::vector<Body*>& input);
-		std::vector<std::vector<Body*> >* getOuput();
+		BroadPhase(BroadPhaseInput& input,sf::RenderWindow& screen);
+		BroadPhaseOuput& getOuput();
 	private:
+		sf::RenderWindow& s;
+		BroadPhaseInput input;
+		BroadPhaseOuput output;
 		std::vector<AABB> aabb;
-		std::vector<std::vector<Body*>> ouput;
-		std::vector<double> xList;
-		std::vector<double> yList;
+
+		BroadPhaseOuputInt split(BroadPhaseInputInt b,AABB& box, int contrat);
 };
+
 
 #endif /* end of include guard: BROADPHASE_SEI59BZF */

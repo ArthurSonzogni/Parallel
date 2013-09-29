@@ -7,12 +7,15 @@
 			double x,y;
 			Vecteur(double X, double Y);
 			double length();
+			void print();
+			Vecteur getNormale();
 	};
 	Vecteur operator+(Vecteur p1, Vecteur p2);
 	Vecteur operator-(Vecteur p1, Vecteur p2);
 	Vecteur operator*(double a, Vecteur p);
 	double operator*(Vecteur p1, Vecteur p2);
 	double operator^(Vecteur p1, Vecteur p2);
+	Vecteur operator^(double a, Vecteur p);
 	Vecteur normalize(Vecteur p);
 	
 #endif /* end of include guard: VECTEUR_U68QPGMC */

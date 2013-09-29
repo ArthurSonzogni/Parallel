@@ -3,6 +3,8 @@
 
 #include <vector>
 #include "vecteur.h"
+#include "matrix.h"
+#include <SFML/Graphics.hpp>
 
 
 class AABB;
@@ -14,15 +16,29 @@ class Body
 	public:
 		Body();
 		AABB getAABB();
-		Collision isColliding(Body& other,bool testOther);
+		Collision isColliding(Body& other);
 
 		void addPoint(Vecteur v);
+		void setPosition(Vecteur p);
+		void addCollisionImpulse(Body& other,Collision& c);
+		void applyTime(double t);
+		void draw(sf::RenderWindow& screen);
+		void setAngle(float angle);
 	private:
 
-		double invmass;
 		std::vector<Vecteur>	pointList;
+
 		Vecteur position;
 		Vecteur speed;
+		double invMass;
+
+		Matrix	orientation;
+		double  angle;
+		double  angularSpeed;
+		double  invInertia;
+
+		void updateOrientation();
+
 };
 
 #endif /* end of include guard: BODY_P1BCP0FY */

@@ -2,9 +2,17 @@
 #include "AABB.h"
 #include "collision.h"
 
+#include <iostream>
+using namespace std;
+
+
 Body::Body():
 	position(0.0,0.0),
-	speed(0.0,0.0)
+	speed(0.0,0.0),
+	invMass(0.0),
+	angle(0.0),
+	angularSpeed(0.0),
+	invInertia(0.0)
 {
 	
 }
@@ -22,21 +30,22 @@ double max(double a, double b)
 AABB Body::getAABB()
 {
 	auto p=pointList.begin();
-	AABB box(p->x,p->x,p->y,p->y);
-	p++;
-	for(;p!=pointList.begin();++p)
+	Vecteur v=orientation*(*p)+position;
+	AABB box(v.x,v.x,v.y,v.y);
+	++p;
+	while(p!=pointList.end())
 	{
-		box.minx=min(box.minx,p->x);
-		box.maxx=max(box.maxx,p->x);
-		box.miny=min(box.miny,p->y);
-		box.maxy=max(box.maxy,p->y);
+		Vecteur v=orientation*(*p)+position;
+		box.minx=min(box.minx,v.x);
+		box.maxx=max(box.maxx,v.x);
+		box.miny=min(box.miny,v.y);
+		box.maxy=max(box.maxy,v.y);
+		++p;
 	}
 	return box;
 }
 
-#include <iostream>
-using namespace std;
-Collision Body::isColliding(Body& other, bool testOther)
+Collision Body::isColliding(Body& other)
 {
 	int nbEdge=pointList.size();
 	int nbEdgeOther=other.pointList.size();
@@ -49,25 +58,24 @@ Collision Body::isColliding(Body& other, bool testOther)
 
 	for(int i=0;i<nbEdge;++i)
 	{
-		double subBestPenetration=0.0;
+		double subBestPenetration=100000.0;
 		Vecteur subBestNormale(0.0,0.0);
-		Vecteur subBestPosition(0.0,0.0);
 		bool in=true;
+		Vecteur myPoint=orientation*pointList[i]+position;
 		for(int j=0;j<nbEdgeOther;++j)
 		{
 			int next=(j+1)%nbEdgeOther;
-			Vecteur v=normalize(other.pointList[next]-other.pointList[j]);
-			penetration=v^(pointList[i]+position-other.pointList[j]-other.position);
+			Vecteur v=normalize(other.orientation*(other.pointList[next]-other.pointList[j]));
+			penetration=v^(myPoint-other.orientation*(other.pointList[j])-other.position);
 			if (penetration<0.0)
 			{
 				in=false;
 				break;
 			}
-			else if (penetration>subBestPenetration)
+			else if (penetration<subBestPenetration)
 			{
 				subBestPenetration=penetration;
-				subBestNormale=v;
-				subBestPosition=pointList[i]+position;
+				subBestNormale=v.getNormale();
 			}
 		}
 		if (in)
@@ -76,7 +84,7 @@ Collision Body::isColliding(Body& other, bool testOther)
 			{
 				bestPenetration=subBestPenetration;
 				bestNormale=subBestNormale;
-				bestPosition=subBestPosition;
+				bestPosition=myPoint;
 			}
 		}
 	}
@@ -84,18 +92,89 @@ Collision Body::isColliding(Body& other, bool testOther)
 	{
 		Collision c;
 		c.isCollision=true;
-		c.direction=bestPenetration*normalize(bestNormale);
+		c.penetration=bestPenetration;
+		c.direction=normalize(bestNormale);
 		c.position=bestPosition;
 		return c;
 	}
 	else
 	{
-		if (testOther) return other.isColliding(*this,false);
-		else return Collision();	
+		return Collision();	
 	}
 }
 
 void Body::addPoint(Vecteur v)
 {
 	pointList.push_back(v);
+}
+
+void Body::setPosition(Vecteur p)
+{
+	position=p;
+}
+
+void Body::addCollisionImpulse(Body& other,Collision& c)
+{
+	// the two objects aren't movable
+	if (invMass+other.invMass == 0.0) return; 
+	
+	Vecteur r0= position - position;
+	Vecteur r1= other.position - other.position;
+	Vecteur v0= speed  - (angularSpeed^r0);
+	Vecteur v1= other.speed  - (other.angularSpeed^r1);
+	// relative velocity
+	Vecteur dv=v0-v1;
+	
+
+	// if the two object are moving away from each other
+	float relativeMovement=(dv*c.direction);
+	if (relativeMovement<0.01)
+		return;
+	
+	// Normal Impulse
+	{
+		// coefficient of restitution
+		float e=0.5;
+		e=e;
+		
+	}
+	
+	//Tangent Impulse
+	{
+
+	}
+
+}
+
+void Body::applyTime(double t)
+{
+	position = position + t*speed;
+	angle = angle + t*angularSpeed;
+}
+
+void Body::updateOrientation()
+{
+	orientation.setAngle(angle);
+}
+
+void Body::draw(sf::RenderWindow& screen)
+{
+	sf::ConvexShape s;
+	int i=0;
+	s.setPointCount(pointList.size());
+	for (auto &p : pointList)
+	{
+		s.setPoint(i,sf::Vector2f(p.x,p.y));
+		++i;
+	}
+	#define RADTODEG 57.2957795131
+	s.rotate(angle*RADTODEG);
+	s.move(sf::Vector2f(position.x,position.y));
+	screen.draw(s);
+}
+
+void Body::setAngle(float Angle)
+{
+	angle=Angle;
+	updateOrientation();
 }
