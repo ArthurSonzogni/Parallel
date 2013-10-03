@@ -15,10 +15,11 @@ using BroadPhaseOuput = std::set<std::pair<int,int> >;
 class BroadPhase
 {
 	public:
-		BroadPhase(BroadPhaseInput& input,sf::RenderWindow& screen);
+		//BroadPhase(BroadPhaseInput& input,sf::RenderWindow& screen);
+		BroadPhase(BroadPhaseInput& input);
 		BroadPhaseOuput& getOuput();
 	private:
-		sf::RenderWindow& s;
+		//sf::RenderWindow& s;
 		BroadPhaseInput input;
 		BroadPhaseOuput output;
 		std::vector<AABB> aabb;

@@ -20,10 +20,15 @@ class Body
 
 		void addPoint(Vecteur v);
 		void setPosition(Vecteur p);
+		Vecteur getPosition();
 		void addCollisionImpulse(Body& other,Collision& c);
 		void applyTime(double t);
 		void draw(sf::RenderWindow& screen);
-		void setAngle(float angle);
+		void setAngle(double angle);
+		void setSpeed(Vecteur speed);
+		Vecteur getSpeed();
+		void addImpulse(Vecteur impulse);
+		void addTorque(double torque);
 	private:
 
 		std::vector<Vecteur>	pointList;
@@ -36,8 +41,8 @@ class Body
 		double  angle;
 		double  angularSpeed;
 		double  invInertia;
-
 		void updateOrientation();
+
 
 };
 

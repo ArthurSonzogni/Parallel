@@ -3,6 +3,7 @@
 #include "physic/Body.h"
 #include "physic/collision.h"
 #include "physic/BroadPhase.h"
+#include <random>
 
 #include <iostream>
 using namespace std;
@@ -33,10 +34,18 @@ int main(int argc, const char *argv[])
 		b.addPoint(Vecteur(+0.0,+32.0));
 		b.setPosition(Vecteur(2.4*32,0.0));
 
-		Body b1=b;
-		Body b2=b;
-		Body b3=b;
-		Body b4=b;
+		vector<Body> generated;
+		for(int ax=0;ax<5;++ax)
+		{
+			for(int ay=0;ay<5;++ay)
+			{
+				if ( (ax+ay*13) % 2 ==0)
+					generated.push_back(a);
+				else
+					generated.push_back(b);
+				generated.back().setPosition(Vecteur(10+ax*200,10+ay*200));
+			}
+		}
 
 		sf::RenderWindow screen;
 		sf::ContextSettings settings;
@@ -45,38 +54,71 @@ int main(int argc, const char *argv[])
 		
 		sf::Clock c;
 		float angle=0.0;
+
+		vector<Body*> v;
+		v.push_back(&a);
+		v.push_back(&b);
+		for(auto &i : generated)
+		{
+			v.push_back(&i);
+		}
+		
+		default_random_engine generator;
+		normal_distribution<double> distribution(0.0,10.0);
+
+		for(auto &it : v)
+		{
+			double vx=distribution(generator);
+			double vy=distribution(generator);
+			it->setSpeed(Vecteur(vx,vy));
+		}
+
 		while(true)
 		{
 			screen.clear(sf::Color(0,0,0));	
 
+			for(int i=0;i<4;i++)
+			{
+				for(auto &it : v)
+					it->applyTime(1.0/180.0);
+
+				BroadPhase bp(v);
+				for(auto &a : bp.getOuput())
+				{
+					Collision ca=v[a.first]->isColliding(*v[a.second]);
+					Collision cb=v[a.second]->isColliding(*v[a.first]);
+					if (ca.penetration>cb.penetration)
+					{
+						if (ca.isCollision)
+							v[a.first]->addCollisionImpulse(*v[a.second],ca);
+
+					}
+					else
+					{
+						if (cb.isCollision)
+							v[a.second]->addCollisionImpulse(*v[a.first],cb);
+					}
+				}
+			}
+			for(auto &it : v)
+			{
+				it->draw(screen);
+			}
 			sf::Vector2i mouse=sf::Mouse::getPosition(screen);
 			auto mouse2=screen.mapPixelToCoords(sf::Vector2i(mouse.x,mouse.y));
-			a.setPosition(Vecteur(mouse2.y,mouse2.x));
-			b.setPosition(Vecteur(mouse2.x,mouse2.y));
-			b1.setPosition(Vecteur(100,100));
-			b2.setPosition(Vecteur(400,100));
-			b3.setPosition(Vecteur(400,400));
-			b4.setPosition(Vecteur(100,400));
-			a.setAngle(angle);
-			b.setAngle(angle);
-			angle+=6.12/30.0*0.1;
+			Vecteur mo=Vecteur(mouse2.x,mouse2.y);
+			Vecteur mv=Vecteur(mouse2.y,mouse2.x);
+			Vecteur pa=a.getPosition();
+			Vecteur pb=b.getPosition();
+			a.addImpulse(0.9*(mo-pa));
+			b.addImpulse(0.9*(mv-pb));
 			
-			a.draw(screen);
-			b.draw(screen);
-			b1.draw(screen);
-			b2.draw(screen);
-			b3.draw(screen);
-			b4.draw(screen);
+			a.setSpeed(0.9*a.getSpeed());
+			b.setSpeed(0.9*b.getSpeed());
+
 			
-			vector<Body*> v;
-			v.push_back(&a);
-			v.push_back(&b);
-			v.push_back(&b1);
-			v.push_back(&b2);
-			v.push_back(&b3);
-			v.push_back(&b4);
-			BroadPhase bp(v,screen);
-			print(bp.getOuput());
+			
+			//cout<<"ratio="<<bp.getOuput().size()*200/v.size()/v.size()<<endl;
 
 			screen.display();
 			sf::sleep(sf::seconds(1.0/30.0)-c.getElapsedTime());

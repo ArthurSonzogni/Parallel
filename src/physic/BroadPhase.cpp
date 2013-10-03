@@ -4,8 +4,9 @@
 #include <iostream>
 using namespace std;
 
-BroadPhase::BroadPhase(BroadPhaseInput& Input,sf::RenderWindow& screen):
-	s(screen),
+//BroadPhase::BroadPhase(BroadPhaseInput& Input,sf::RenderWindow& screen):
+BroadPhase::BroadPhase(BroadPhaseInput& Input):
+	//s(screen),
 	input(Input)
 {
 	// generate AABB list
@@ -22,7 +23,7 @@ BroadPhase::BroadPhase(BroadPhaseInput& Input,sf::RenderWindow& screen):
 		allAABB.mix(i);
 	}
 
-	allAABB.draw(screen);
+	//allAABB.draw(screen);
 
 	// vector select all
 	BroadPhaseInputInt selectorAll;
@@ -86,8 +87,8 @@ BroadPhaseOuputInt BroadPhase::split(BroadPhaseInputInt b,AABB& box, int contrat
 			BroadPhaseOuputInt out1=split(input1,firstAABB,contrat*9/10);
 			BroadPhaseOuputInt out2=split(input2,secondAABB,contrat*9/10);
 
-			firstAABB.draw(s);
-			secondAABB.draw(s);
+			//firstAABB.draw(s);
+			//secondAABB.draw(s);
 			
 			out1.reserve(out1.size()+out2.size());	
 			out1.insert(out1.end(),out2.begin(),out2.end());
