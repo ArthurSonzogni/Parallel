@@ -64,7 +64,7 @@ int main(int argc, const char *argv[])
 		}
 		
 		default_random_engine generator;
-		normal_distribution<double> distribution(0.0,10.0);
+		normal_distribution<double> distribution(0.0,100.0);
 
 		for(auto &it : v)
 		{
@@ -77,10 +77,11 @@ int main(int argc, const char *argv[])
 		{
 			screen.clear(sf::Color(0,0,0));	
 
-			for(int i=0;i<4;i++)
+			const float detail=2;
+			for(int i=0;i<detail;i++)
 			{
 				for(auto &it : v)
-					it->applyTime(1.0/180.0);
+					it->applyTime(1.0/60.0/detail);
 
 				BroadPhase bp(v);
 				for(auto &a : bp.getOuput())
@@ -110,18 +111,18 @@ int main(int argc, const char *argv[])
 			Vecteur mv=Vecteur(mouse2.y,mouse2.x);
 			Vecteur pa=a.getPosition();
 			Vecteur pb=b.getPosition();
-			a.addImpulse(0.9*(mo-pa));
-			b.addImpulse(0.9*(mv-pb));
+			//a.addImpulse(0.5*(mo-pa));
+			//b.addImpulse(0.5*(mv-pb));
 			
-			a.setSpeed(0.9*a.getSpeed());
-			b.setSpeed(0.9*b.getSpeed());
+			//a.setSpeed(0.92*a.getSpeed());
+			//b.setSpeed(0.92*b.getSpeed());
 
 			
 			
 			//cout<<"ratio="<<bp.getOuput().size()*200/v.size()/v.size()<<endl;
 
 			screen.display();
-			sf::sleep(sf::seconds(1.0/30.0)-c.getElapsedTime());
+			sf::sleep(sf::seconds(1.0/60.0)-c.getElapsedTime());
 			c.restart();
 		}
 
@@ -150,7 +151,7 @@ int main(int argc, const char *argv[])
 			anim.draw(100,100,t,screen);
 			screen.display();
 			
-			sf::sleep(sf::seconds(1.0/30.0)-cc.getElapsedTime());
+			sf::sleep(sf::seconds(1.0/60.0)-cc.getElapsedTime());
 			cc.restart();
 
 		}
