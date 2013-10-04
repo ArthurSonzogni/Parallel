@@ -26,6 +26,8 @@ int main(int argc, const char *argv[])
 		a.addPoint(Vecteur(+32.0,+32.0));
 		a.addPoint(Vecteur(-32.0,+32.0));
 		a.setPosition(Vecteur(0.0,0.0));
+		a.setMasse(0.25);
+		a.setInertia(1000.0);
 
 
 		b.addPoint(Vecteur(-48,+0.0));
@@ -33,6 +35,8 @@ int main(int argc, const char *argv[])
 		b.addPoint(Vecteur(+48,+0.0));
 		b.addPoint(Vecteur(+0.0,+32.0));
 		b.setPosition(Vecteur(2.4*32,0.0));
+		b.setMasse(0.25);
+		b.setInertia(1000.0);
 
 		vector<Body> generated;
 		for(int ax=0;ax<5;++ax)
@@ -44,6 +48,8 @@ int main(int argc, const char *argv[])
 				else
 					generated.push_back(b);
 				generated.back().setPosition(Vecteur(10+ax*200,10+ay*200));
+				generated.back().setMasse(0.25);
+				generated.back().setInertia(1000.0);
 			}
 		}
 
@@ -111,10 +117,10 @@ int main(int argc, const char *argv[])
 			Vecteur mv=Vecteur(mouse2.y,mouse2.x);
 			Vecteur pa=a.getPosition();
 			Vecteur pb=b.getPosition();
-			//a.addImpulse(0.5*(mo-pa));
+			a.addImpulse(0.5*(mo-pa));
 			//b.addImpulse(0.5*(mv-pb));
 			
-			//a.setSpeed(0.92*a.getSpeed());
+			a.setSpeed(0.92*a.getSpeed());
 			//b.setSpeed(0.92*b.getSpeed());
 
 			

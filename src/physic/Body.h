@@ -29,8 +29,12 @@ class Body
 		Vecteur getSpeed();
 		void addImpulse(Vecteur impulse);
 		void addTorque(double torque);
+		void setMasse(double mass);
+		void setInertia(double inertia);
 	private:
-
+		
+		int group;
+		int collisionGroup;
 		std::vector<Vecteur>	pointList;
 
 		Vecteur position;

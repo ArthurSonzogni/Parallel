@@ -7,6 +7,8 @@ using namespace std;
 
 
 Body::Body():
+	group=0;
+	collisionGroup=0;
 	position(0.0,0.0),
 	speed(0.0,0.0),
 	invMass(0.0),
@@ -115,10 +117,6 @@ void Body::setPosition(Vecteur p)
 
 void Body::addCollisionImpulse(Body& other,Collision& c)
 {
-	invMass = 4.0;
-	other.invMass = 4.0;
-	invInertia = 0.001;
-	other.invInertia = 0.001;
 	// the two objects aren't movable
 	if (invMass+other.invMass == 0.0) return; 
 	
@@ -140,7 +138,7 @@ void Body::addCollisionImpulse(Body& other,Collision& c)
 	// Normal Impulse
 	{
 		// coefficient of restitution
-		double e=0.01;
+		double e=0.5;
 		double normDiv = (normal*normal)*(invMass + other.invMass) 
 						+ normal*
 						 (
@@ -246,4 +244,18 @@ Vecteur Body::getPosition()
 Vecteur Body::getSpeed()
 {
 	return speed;
+}
+void Body::setMasse(double mass)
+{
+	if (mass==0)
+		invMass=0.0;
+	else
+		invMass=1.0/mass;
+}
+void Body::setInertia(double inertia)
+{
+	if (inertia==0)
+		invInertia=0.0;
+	else
+		invInertia=1.0/inertia;
 }
