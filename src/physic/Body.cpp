@@ -6,9 +6,13 @@
 using namespace std;
 
 
+#define minWeight 0.0001
+
 Body::Body():
-	group=0;
-	collisionGroup=0;
+	group(0),
+	collisionGroup(0),
+	restitution(0.5),
+	friction(0.4),
 	position(0.0,0.0),
 	speed(0.0,0.0),
 	invMass(0.0),
@@ -118,7 +122,8 @@ void Body::setPosition(Vecteur p)
 void Body::addCollisionImpulse(Body& other,Collision& c)
 {
 	// the two objects aren't movable
-	if (invMass+other.invMass == 0.0) return; 
+	if (invMass+other.invMass < minWeight) return; 
+	
 	
 	Vecteur r0= c.position - position;
 	Vecteur r1= c.position - other.position;
@@ -138,13 +143,13 @@ void Body::addCollisionImpulse(Body& other,Collision& c)
 	// Normal Impulse
 	{
 		// coefficient of restitution
-		double e=0.5;
+		double e=(restitution+other.restitution)*0.5;
 		double normDiv = (normal*normal)*(invMass + other.invMass) 
-						+ normal*
-						 (
-						  	((invInertia*(r0^normal))^r0) +
-						  	((other.invInertia*(r1^normal))^r1) 
-						 )
+					+ normal*
+							 (
+								((invInertia*(r0^normal))^r0) +
+								((other.invInertia*(r1^normal))^r1) 
+							 )
 						;
 		
 		jn =  (-1.0 - e) * (dv*normal) / normDiv;
@@ -164,19 +169,22 @@ void Body::addCollisionImpulse(Body& other,Collision& c)
 	//Tangent Impulse
 	{
 		Vecteur tangent= dv - (dv*normal)*normal;
+		if (tangent*tangent<minWeight) return;
 		tangent=normalize(tangent);
-		double tangDiv = invMass + other.invMass;
+		double tangDiv = invMass + other.invMass
 			+ (tangent *
-			(
-				 (invInertia*(r0^tangent)^r0)+
-				 (other.invInertia*(r1^tangent)^r1)
-			)
+				(
+					 (invInertia*(r0^tangent)^r0)+
+					 (other.invInertia*(r1^tangent)^r1)
+				)
 			);
 		jt = (-1.0)* (dv*tangent)/tangDiv;
 		
-		const float coef=0.1;
+		float coef=(friction+other.friction)*0.5;
 		if (jt>coef*jn)
 			jt=coef*jn;
+		else if (jt<-coef*jn)
+			jt=-coef*jn;
 		
 		
 		addImpulse(invMass * jt  * tangent);
@@ -247,15 +255,28 @@ Vecteur Body::getSpeed()
 }
 void Body::setMasse(double mass)
 {
-	if (mass==0)
+	if (mass<minWeight)
 		invMass=0.0;
 	else
 		invMass=1.0/mass;
 }
 void Body::setInertia(double inertia)
 {
-	if (inertia==0)
+	if (inertia<minWeight)
 		invInertia=0.0;
 	else
 		invInertia=1.0/inertia;
+}
+
+bool Body::isLinearStatic()
+{
+	return invMass==0.0;
+}
+void Body::setRestitution(double r)
+{
+	restitution=r;
+}
+void Body::setFriction(double f)
+{
+	friction=f;
 }

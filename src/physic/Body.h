@@ -31,10 +31,15 @@ class Body
 		void addTorque(double torque);
 		void setMasse(double mass);
 		void setInertia(double inertia);
+		void setRestitution(double r);
+		void setFriction(double f);
+		bool isLinearStatic();
 	private:
 		
 		int group;
 		int collisionGroup;
+		float restitution;
+		float friction;
 		std::vector<Vecteur>	pointList;
 
 		Vecteur position;

@@ -6,6 +6,7 @@
 #include <random>
 
 #include <iostream>
+#include "gameplay/gameLevel.h"
 using namespace std;
 
 void print(set<pair<int,int>> i)
@@ -19,6 +20,16 @@ void print(set<pair<int,int>> i)
 
 int main(int argc, const char *argv[])
 {
+	if (true)
+	{
+		sf::RenderWindow screen;
+		sf::ContextSettings settings;
+		settings.antialiasingLevel = 4;
+		screen.create(sf::VideoMode(800,600),"Parallel",sf::Style::Default,settings);
+
+		GameLevel gl(screen);
+	}
+	if (false)
 	{
 		Body a,b;
 		a.addPoint(Vecteur(-32.0,-32.0));
@@ -32,7 +43,7 @@ int main(int argc, const char *argv[])
 
 		b.addPoint(Vecteur(-48,+0.0));
 		b.addPoint(Vecteur(+0.0,-32.0));
-		b.addPoint(Vecteur(+48,+0.0));
+		b.addPoint(Vecteur(+100,+0.0));
 		b.addPoint(Vecteur(+0.0,+32.0));
 		b.setPosition(Vecteur(2.4*32,0.0));
 		b.setMasse(0.25);
@@ -44,12 +55,20 @@ int main(int argc, const char *argv[])
 			for(int ay=0;ay<5;++ay)
 			{
 				if ( (ax+ay*13) % 2 ==0)
+				{
 					generated.push_back(a);
+					generated.back().setPosition(Vecteur(100+ax*200,100+ay*200));
+					generated.back().setMasse(0.25);
+					generated.back().setInertia(0.0);
+
+				}
 				else
+				{
 					generated.push_back(b);
-				generated.back().setPosition(Vecteur(10+ax*200,10+ay*200));
-				generated.back().setMasse(0.25);
-				generated.back().setInertia(1000.0);
+					generated.back().setPosition(Vecteur(100+ax*200,100+ay*200));
+					generated.back().setMasse(0.25);
+					generated.back().setInertia(1000.0);
+				}
 			}
 		}
 
@@ -76,7 +95,7 @@ int main(int argc, const char *argv[])
 		{
 			double vx=distribution(generator);
 			double vy=distribution(generator);
-			it->setSpeed(Vecteur(vx,vy));
+			//it->setSpeed(Vecteur(vx,vy));
 		}
 
 		while(true)
@@ -94,17 +113,10 @@ int main(int argc, const char *argv[])
 				{
 					Collision ca=v[a.first]->isColliding(*v[a.second]);
 					Collision cb=v[a.second]->isColliding(*v[a.first]);
-					if (ca.penetration>cb.penetration)
-					{
-						if (ca.isCollision)
-							v[a.first]->addCollisionImpulse(*v[a.second],ca);
-
-					}
-					else
-					{
-						if (cb.isCollision)
-							v[a.second]->addCollisionImpulse(*v[a.first],cb);
-					}
+					if (ca.isCollision)
+						v[a.first]->addCollisionImpulse(*v[a.second],ca);
+					if (cb.isCollision)
+						v[a.second]->addCollisionImpulse(*v[a.first],cb);
 				}
 			}
 			for(auto &it : v)
