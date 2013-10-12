@@ -4,6 +4,7 @@
 #include "physic/collision.h"
 #include "physic/BroadPhase.h"
 #include <random>
+#include "map/mapLoader.h"
 
 #include <iostream>
 #include "gameplay/gameLevel.h"
@@ -21,6 +22,32 @@ void print(set<pair<int,int>> i)
 int main(int argc, const char *argv[])
 {
 	if (true)
+	{
+		MapLoader maploader(string("level/essai.tmx"));
+		sf::Clock c;
+		sf::RenderWindow screen;
+		sf::ContextSettings settings;
+		settings.antialiasingLevel = 4;
+		screen.create(sf::VideoMode(800,600),"Parallel",sf::Style::Default,settings);
+		for(;;)
+		{
+
+			screen.clear(sf::Color(0,0,0));
+			
+			std::vector<MapLayer>& backgroundLayer=maploader.getLayerBackground();
+			std::vector<MapLayer>& foregroundLayer=maploader.getLayerForeground();
+			for(auto &l : backgroundLayer)
+				maploader.draw(l,screen);
+
+			for(auto &l : foregroundLayer)
+				maploader.draw(l,screen);
+			
+			screen.display();
+			sf::sleep(sf::seconds(1.0/60.0)-c.getElapsedTime());
+			c.restart();
+		}
+	}
+	if (false)
 	{
 		sf::RenderWindow screen;
 		sf::ContextSettings settings;
@@ -78,7 +105,7 @@ int main(int argc, const char *argv[])
 		screen.create(sf::VideoMode(800,600),"Parallel",sf::Style::Default,settings);
 		
 		sf::Clock c;
-		float angle=0.0;
+		//float angle=0.0;
 
 		vector<Body*> v;
 		v.push_back(&a);
@@ -91,12 +118,12 @@ int main(int argc, const char *argv[])
 		default_random_engine generator;
 		normal_distribution<double> distribution(0.0,100.0);
 
-		for(auto &it : v)
-		{
-			double vx=distribution(generator);
-			double vy=distribution(generator);
-			//it->setSpeed(Vecteur(vx,vy));
-		}
+		//for(auto &it : v)
+		//{
+			//double vx=distribution(generator);
+			//double vy=distribution(generator);
+			////it->setSpeed(Vecteur(vx,vy));
+		//}
 
 		while(true)
 		{
@@ -123,17 +150,17 @@ int main(int argc, const char *argv[])
 			{
 				it->draw(screen);
 			}
-			sf::Vector2i mouse=sf::Mouse::getPosition(screen);
-			auto mouse2=screen.mapPixelToCoords(sf::Vector2i(mouse.x,mouse.y));
-			Vecteur mo=Vecteur(mouse2.x,mouse2.y);
-			Vecteur mv=Vecteur(mouse2.y,mouse2.x);
-			Vecteur pa=a.getPosition();
-			Vecteur pb=b.getPosition();
-			a.addImpulse(0.5*(mo-pa));
-			//b.addImpulse(0.5*(mv-pb));
+			//sf::Vector2i mouse=sf::Mouse::getPosition(screen);
+			//auto mouse2=screen.mapPixelToCoords(sf::Vector2i(mouse.x,mouse.y));
+			//Vecteur mo=Vecteur(mouse2.x,mouse2.y);
+			//Vecteur mv=Vecteur(mouse2.y,mouse2.x);
+			//Vecteur pa=a.getPosition();
+			//Vecteur pb=b.getPosition();
+			//a.addImpulse(0.5*(mo-pa));
+			////b.addImpulse(0.5*(mv-pb));
 			
-			a.setSpeed(0.92*a.getSpeed());
-			//b.setSpeed(0.92*b.getSpeed());
+			//a.setSpeed(0.92*a.getSpeed());
+			////b.setSpeed(0.92*b.getSpeed());
 
 			
 			
