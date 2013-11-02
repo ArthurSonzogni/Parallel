@@ -1,6 +1,7 @@
 #include "Body.h"
 #include "AABB.h"
 #include "collision.h"
+#include <algorithm>
 
 #include <iostream>
 using namespace std;
@@ -279,4 +280,16 @@ void Body::setRestitution(double r)
 void Body::setFriction(double f)
 {
 	friction=f;
+}
+void Body::reoriente()
+{
+	if (pointList.size()<=2) return;
+	Vecteur ab=pointList[1]-pointList[0];
+	Vecteur bc=pointList[2]-pointList[1];
+	float r=bc^ab;
+	if (r>0.0)
+	{
+		reverse(pointList.begin(),pointList.end());
+		cout<<"je reverse"<<endl;
+	}
 }

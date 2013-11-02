@@ -66,6 +66,10 @@ void MapLoader::parseMap(XMLElement* element)
 			{
 				parseLayer(element);
 			}
+			else if (value=="objectgroup")
+			{
+				parseObjectGroup(element);
+			}
 		}
 		node = node->NextSibling();
 	}
@@ -189,15 +193,110 @@ void MapLoader::parseLayer(XMLElement* element)
 	}
 }
 
+void MapLoader::parseObjectGroup(tinyxml2::XMLElement* element)
+{
+	const char* tilesetName=element->Attribute("name");
+	if (tilesetName)
+	{
+		if (string("fixed")==tilesetName)
+			parseFixedObject(element);
+	}
+}
+
+void MapLoader::parseFixedObject(tinyxml2::XMLElement* element)
+{
+	XMLNode* node=element->FirstChild();
+	while(node)
+	{
+		XMLElement* element=node->ToElement();
+		if (element)
+		{
+			string value=element->Value();
+			if (value=="object")
+			{
+				int x,y;
+				int returnX = element->QueryIntAttribute("x",&x);
+				int returnY = element->QueryIntAttribute("y",&y);
+				if (returnX==XML_NO_ERROR and returnY==XML_NO_ERROR)
+				{
+					XMLNode* node=element->FirstChild();
+					while(node)
+					{
+						XMLElement* element=node->ToElement();
+						if (element)
+						{
+							string value=element->Value();
+							if (value=="polygon")
+							{
+								const char* value=element->Attribute("points");
+								if (value)
+								{
+									unsigned int index=0;
+									int buf=0;
+									bool left=true;
+									int xpos=0;
+									bool inv=false;
+									Body body;
+									if (value[index]!='\0')
+									for(;;)
+									{
+										char v=value[index];
+										if (v>='0' and v<='9')
+										{
+											buf=10*buf+v-'0';
+										}
+										else if (v=='-')
+										{
+											inv=true;
+										}
+										else
+										{
+											if (left)
+											{
+												if (inv) buf=-buf;
+												inv=false;
+												xpos=buf;
+												buf=0;
+											}
+											else
+											{
+												if (inv) buf=-buf;
+												inv=false;
+												cout<<"point("<<xpos<<","<<buf<<")"<<endl;
+												body.addPoint(Vecteur(x+xpos,y+buf));
+												buf=0;
+											}
+											left^=true;
+											if (v=='\0')
+											{
+												body.reoriente();
+												fixedBody.push_back(body);
+												cout<<"ajout"<<endl;
+												break;
+											}
+										}
+										index++;
+									}
+								}
+							}
+						}
+						node = node->NextSibling();
+					}
+				}
+			}
+		}
+		node = node->NextSibling();
+	}
+}
 
 vector<MapLayer>& MapLoader::getLayerBackground()
 {
-	return foregroundLayers;
+	return backgroundLayers;
 }
 
 vector<MapLayer>& MapLoader::getLayerForeground()
 {
-	return backgroundLayers;
+	return foregroundLayers;
 }
 
 int MapLoader::idToGid(int gid)
@@ -239,4 +338,9 @@ void MapLoader::draw(MapLayer& layer,sf::RenderWindow& screen)
 		}
 		y+=32;
 	}
+}
+
+vector<Body>& MapLoader::getFixedBody()
+{
+	return fixedBody;
 }

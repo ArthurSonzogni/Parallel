@@ -34,6 +34,8 @@ class Body
 		void setRestitution(double r);
 		void setFriction(double f);
 		bool isLinearStatic();
+		
+		void reoriente();
 	private:
 		
 		int group;

@@ -21,40 +21,44 @@ void print(set<pair<int,int>> i)
 
 int main(int argc, const char *argv[])
 {
+	//if (true)
+	//{
+		//MapLoader maploader(string("level/essai.tmx"));
+		//sf::Clock c;
+		//sf::RenderWindow screen;
+		//sf::ContextSettings settings;
+		//settings.antialiasingLevel = 4;
+		//screen.create(sf::VideoMode(800,600),"Parallel",sf::Style::Default,settings);
+		//for(;;)
+		//{
+
+			//screen.clear(sf::Color(0,0,0));
+			
+			//std::vector<MapLayer>& backgroundLayer=maploader.getLayerBackground();
+			//std::vector<MapLayer>& foregroundLayer=maploader.getLayerForeground();
+			//for(auto &l : backgroundLayer)
+				//maploader.draw(l,screen);
+
+			//for(auto &l : foregroundLayer)
+				//maploader.draw(l,screen);
+			
+			//screen.display();
+			//sf::sleep(sf::seconds(1.0/60.0)-c.getElapsedTime());
+			//c.restart();
+		//}
+	//}
 	if (true)
 	{
-		MapLoader maploader(string("level/essai.tmx"));
-		sf::Clock c;
 		sf::RenderWindow screen;
 		sf::ContextSettings settings;
 		settings.antialiasingLevel = 4;
-		screen.create(sf::VideoMode(800,600),"Parallel",sf::Style::Default,settings);
-		for(;;)
-		{
+		screen.create(sf::VideoMode(800,600),"--Parallel--",sf::Style::Default,settings);
 
-			screen.clear(sf::Color(0,0,0));
-			
-			std::vector<MapLayer>& backgroundLayer=maploader.getLayerBackground();
-			std::vector<MapLayer>& foregroundLayer=maploader.getLayerForeground();
-			for(auto &l : backgroundLayer)
-				maploader.draw(l,screen);
-
-			for(auto &l : foregroundLayer)
-				maploader.draw(l,screen);
-			
-			screen.display();
-			sf::sleep(sf::seconds(1.0/60.0)-c.getElapsedTime());
-			c.restart();
-		}
-	}
-	if (false)
-	{
-		sf::RenderWindow screen;
-		sf::ContextSettings settings;
-		settings.antialiasingLevel = 4;
-		screen.create(sf::VideoMode(800,600),"Parallel",sf::Style::Default,settings);
-
-		GameLevel gl(screen);
+		GameLevel gl;
+		gl.setScreen(screen);
+		gl.setMap1("level/essai.tmx");
+		gl.setMap2("level/essai.tmx");
+		gl.execute();
 	}
 	if (false)
 	{

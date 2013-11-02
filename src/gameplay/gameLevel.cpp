@@ -8,22 +8,57 @@ using namespace sf;
 using namespace std;
 
 
-GameLevel::GameLevel(RenderWindow& s):
-	screen(s)
+GameLevel::GameLevel()
 {
-	character.addPoint(Vecteur(-16.0,-64.0));
-	character.addPoint(Vecteur(+16.0,-64.0));
-	character.addPoint(Vecteur(+32.0,-48.0));
-	character.addPoint(Vecteur(+32.0,+48.0));
-	character.addPoint(Vecteur(+16.0,+64.0));
-	character.addPoint(Vecteur(-16.0,+64.0));
-	character.addPoint(Vecteur(-32.0,+48.0));
-	character.addPoint(Vecteur(-32.0,-48.0));
-	character.setMasse(0.25);
-	character.setInertia(0.0);
-	character.setPosition(Vecteur(400.0,0.0));
+	map1 = NULL;
+	map2 = NULL;
+	screen = NULL;
+}
 
-	
+GameLevel::~GameLevel()
+{
+	if (map1) delete map1;
+	if (map2) delete map2;
+}
+
+
+void GameLevel::setScreen(sf::RenderWindow& s)
+{
+	screen=&s;
+}
+
+void GameLevel::setMap1(std::string m)
+{
+	if (map1==NULL) delete map1;
+	map1 = new MapLoader(m);
+}
+
+void GameLevel::setMap2(std::string m)
+{
+	if (map2==NULL) delete map2;
+	map2 = new MapLoader(m);
+}
+
+void GameLevel::execute()
+{
+	// ajout des objets fixes.
+	collisionBody.insert(collisionBody.end(),map1->getFixedBody().begin(),map1->getFixedBody().end());
+
+	character1.addPoint(Vecteur(-16.0,-64.0));
+	character1.addPoint(Vecteur(+16.0,-64.0));
+	character1.addPoint(Vecteur(+32.0,-48.0));
+	character1.addPoint(Vecteur(+32.0,+48.0));
+	character1.addPoint(Vecteur(+16.0,+64.0));
+	character1.addPoint(Vecteur(-16.0,+64.0));
+	character1.addPoint(Vecteur(-32.0,+48.0));
+	character1.addPoint(Vecteur(-32.0,-48.0));
+	character1.setMasse(0.25);
+	character1.setInertia(0.0);
+	character1.setPosition(Vecteur(400.0,0.0));
+
+	character2 = character1;
+	character2.setPosition(Vecteur(400,-200));
+
 	Body triangle;
 	for(float t=0;t<=6.28;t+=6.28/16.0)
 	{
@@ -39,11 +74,10 @@ GameLevel::GameLevel(RenderWindow& s):
 		{
 			if ( (ax+ay*13) % 2 ==0)
 			{
-				collisionBody.push_back(character);
+				collisionBody.push_back(character1);
 				collisionBody.back().setPosition(Vecteur(dx+ax*dx,dx+ay*dx));
 				collisionBody.back().setMasse(0.50);
 				collisionBody.back().setInertia(500.0);
-
 			}
 			else
 			{
@@ -51,23 +85,15 @@ GameLevel::GameLevel(RenderWindow& s):
 				collisionBody.back().setPosition(Vecteur(dx+ax*dx,dx+ay*dx));
 				collisionBody.back().setMasse(0.50);
 				collisionBody.back().setInertia(500.0);
-
 			}
 		}
 	}
 	
 
 	
-	// ajout d'un sol
-	collisionBody.push_back(Body());
-	collisionBody.back().addPoint(Vecteur(-1000.0,600.0));
-	collisionBody.back().addPoint(Vecteur(-1000.0,550.0));
-	collisionBody.back().addPoint(Vecteur(2000.0,550.0));
-	collisionBody.back().addPoint(Vecteur(2000.0,600.0));
-	collisionBody.back().setMasse(0.0);
-	collisionBody.back().setInertia(0.0);
 	
-	allBodyRef.push_back(&character);
+	allBodyRef.push_back(&character1);
+	allBodyRef.push_back(&character2);
 	for(auto &it : collisionBody)
 	{
 		allBodyRef.push_back(&it);
@@ -81,20 +107,30 @@ GameLevel::GameLevel(RenderWindow& s):
 	{
 		// event
 		Event event;
-		while(screen.pollEvent(event));
+		while(screen->pollEvent(event));
 
-		Vecteur cv=character.getSpeed();
-		if (Keyboard::isKeyPressed(Keyboard::Right) and cv.x<256.0)
-				character.addImpulse(Vecteur(30.0,0.0));
+		Vecteur v1=character1.getSpeed();
+		Vecteur v2=character2.getSpeed();
+		if (Keyboard::isKeyPressed(Keyboard::Right))
+		{
+			if (v1.x<256.0)
+				character1.addImpulse(Vecteur(30.0,0.0));
+			if (v2.x<256.0)
+				character2.addImpulse(Vecteur(30.0,0.0));
+		}
 
-		if (Keyboard::isKeyPressed(Keyboard::Left) and cv.x>-256.0)
-				character.addImpulse(Vecteur(-30.0,0.0));
+		if (Keyboard::isKeyPressed(Keyboard::Left))
+		{
+			if (v1.x>-256.0)
+				character1.addImpulse(Vecteur(-30.0,0.0));
+			if (v2.x>-256.0)
+				character2.addImpulse(Vecteur(-30.0,0.0));
+		}
 
 		if (Keyboard::isKeyPressed(Keyboard::Up))
-				character.addImpulse(Vecteur(0.0,-50.0));
+				character1.addImpulse(Vecteur(0.0,-50.0));
 		
 
-		screen.clear(Color(0,0,0));
 
 		// physic
 		for(auto &it : allBodyRef)
@@ -121,11 +157,7 @@ GameLevel::GameLevel(RenderWindow& s):
 			}
 		}
 		
-		//graphic
-		character.draw(screen);
-		for(auto &it : collisionBody)
-			it.draw(screen);
-		screen.display();	
+		draw();
 
 		// time
 		tt+=1.0/30.0-c.getElapsedTime().asSeconds();
@@ -134,8 +166,22 @@ GameLevel::GameLevel(RenderWindow& s):
 			cout<<int(tt/tttt*100.0)<<endl;
 		sf::sleep(sf::seconds(1.0/30.0)-c.getElapsedTime());
 		c.restart();
-		
 	}
 }
 
+void GameLevel::draw()
+{
+	screen->clear(Color(0,0,0));
+	vector<MapLayer>& background1 = map1->getLayerBackground();
+	for(auto &l : background1)
+		map1->draw(l,*screen);
+	for(auto &it : collisionBody)
+		it.draw(*screen);
+	character1.draw(*screen);
+	character2.draw(*screen);
+	vector<MapLayer>& foreground1 = map1->getLayerForeground();
+	for(auto &l : foreground1)
+		map1->draw(l,*screen);
+	screen->display();
+}
 
