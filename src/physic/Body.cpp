@@ -9,11 +9,20 @@ using namespace std;
 
 #define minWeight 0.0001
 
+bool equalZero(double d)
+{
+	return d*d<0.0001;
+}
+bool equalZero(Vecteur d)
+{
+	return d*d<0.0001;
+}
+
 Body::Body():
 	group(0),
 	collisionGroup(0),
 	restitution(0.5),
-	friction(0.4),
+	friction(0.1),
 	position(0.0,0.0),
 	speed(0.0,0.0),
 	invMass(0.0),
@@ -177,16 +186,21 @@ void Body::addCollisionImpulse(Body& other,Collision& c)
 		addTorque(invInertia * (r0^(jt*tangent)));
 		other.addTorque(other.invInertia * (r1^(jt*tangent)));
 
-		
-
 	}
 
 }
 
 void Body::applyTime(double t)
 {
-	position = position + t*speed;
-	angle = angle + t*angularSpeed;
+	speed=0.9999*speed;
+	angularSpeed*=0.999999;
+
+	if (equalZero(speed)) speed=Vecteur(0.0,0.0);
+	else position = position + t*speed;
+
+	if (equalZero(angularSpeed)) angularSpeed=0.0;
+	else angle = angle + t*angularSpeed;
+
 	updateOrientation();
 }
 
