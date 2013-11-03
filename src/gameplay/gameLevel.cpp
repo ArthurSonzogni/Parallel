@@ -52,7 +52,7 @@ void GameLevel::execute()
 	character1.addPoint(Vecteur(-16.0,+64.0));
 	character1.addPoint(Vecteur(-32.0,+48.0));
 	character1.addPoint(Vecteur(-32.0,-48.0));
-	character1.setMasse(0.25);
+	character1.setMasse(0.50);
 	character1.setInertia(0.0);
 	character1.setPosition(Vecteur(400.0,0.0));
 
@@ -64,7 +64,7 @@ void GameLevel::execute()
 	{
 		triangle.addPoint(Vecteur(30.0*cos(t),30.0*sin(t)));
 	}
-	triangle.setMasse(0.1);
+	triangle.setMasse(0.50);
 	triangle.setInertia(100.0);
 
 	const float dx=150;
@@ -139,6 +139,7 @@ void GameLevel::execute()
 				it->addImpulse(Vecteur(0.0,10.0));
 		}
 
+		draw();
 		const float detail=2;
 		for(int i=0;i<detail;++i)
 		{
@@ -148,16 +149,24 @@ void GameLevel::execute()
 			auto &v = allBodyRef; // alias
 			for(auto &a : bp.getOuput())
 			{
-				Collision ca=v[a.first]->isColliding(*v[a.second]);
-				Collision cb=v[a.second]->isColliding(*v[a.first]);
-				if (ca.isCollision)
-					v[a.first]->addCollisionImpulse(*v[a.second],ca);
-				if (cb.isCollision)
-					v[a.second]->addCollisionImpulse(*v[a.first],cb);
+				vector<Collision> ca=v[a.first]->isColliding(*v[a.second]);
+				vector<Collision> cb=v[a.second]->isColliding(*v[a.first]);
+				Collision cca=add(ca);
+				Collision ccb=add(cb);
+				for(auto &collision : ca)
+				{
+					collision.draw(*screen);
+					v[a.first]->addCollisionImpulse(*v[a.second],collision);
+				}
+				for(auto &collision : cb)
+				{
+					collision.draw(*screen);
+					v[a.second]->addCollisionImpulse(*v[a.first],collision);
+				}
 			}
 		}
 		
-		draw();
+		screen->display();
 
 		// time
 		tt+=1.0/30.0-c.getElapsedTime().asSeconds();
@@ -182,6 +191,5 @@ void GameLevel::draw()
 	vector<TileMap>& foreground1 = map1->getTileMapForeground();
 	for(auto &l : foreground1)
 		screen->draw(l);
-	screen->display();
 }
 

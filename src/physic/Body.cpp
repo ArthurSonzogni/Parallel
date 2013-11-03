@@ -2,7 +2,7 @@
 #include "AABB.h"
 #include "collision.h"
 #include <algorithm>
-
+#include <SFML/Graphics.hpp>
 #include <iostream>
 using namespace std;
 
@@ -52,21 +52,17 @@ AABB Body::getAABB()
 	return box;
 }
 
-Collision Body::isColliding(Body& other)
+vector<Collision> Body::isColliding(Body& other)
 {
 	int nbEdge=pointList.size();
 	int nbEdgeOther=other.pointList.size();
-
-	double bestPenetration=0.0;
-	Vecteur bestNormale(0.0,0.0);
-	Vecteur bestPosition(0.0,0.0);
-
 	double penetration;
+	vector<Collision> retour;
 
 	for(int i=0;i<nbEdge;++i)
 	{
-		double subBestPenetration=100000.0;
-		Vecteur subBestNormale(0.0,0.0);
+		double bestPenetration=1000000.0;
+		Vecteur bestNormale(0.0,0.0);
 		bool in=true;
 		Vecteur myPoint=orientation*pointList[i]+position;
 		for(int j=0;j<nbEdgeOther;++j)
@@ -79,35 +75,22 @@ Collision Body::isColliding(Body& other)
 				in=false;
 				break;
 			}
-			else if (penetration<subBestPenetration)
+			else if (penetration<bestPenetration)
 			{
-				subBestPenetration=penetration;
-				subBestNormale=v.getNormale();
+				bestPenetration=penetration;
+				bestNormale=v.getNormale();
 			}
 		}
 		if (in)
 		{
-			if (subBestPenetration>bestPenetration)
-			{
-				bestPenetration=subBestPenetration;
-				bestNormale=subBestNormale;
-				bestPosition=myPoint;
-			}
+			Collision c;
+			c.penetration=bestPenetration;
+			c.direction=normalize(bestNormale);
+			c.position=myPoint;
+			retour.push_back(c);
 		}
 	}
-	if (bestPenetration>0.0)
-	{
-		Collision c;
-		c.isCollision=true;
-		c.penetration=bestPenetration;
-		c.direction=normalize(bestNormale);
-		c.position=bestPosition;
-		return c;
-	}
-	else
-	{
-		return Collision();	
-	}
+	return retour;
 }
 
 void Body::addPoint(Vecteur v)
@@ -137,7 +120,7 @@ void Body::addCollisionImpulse(Body& other,Collision& c)
 	
 	// if the two object are moving away from each other
 	double relativeMovement=-(dv*normal);
-	if (relativeMovement<-0.01)
+	if (relativeMovement<-0.0001)
 		return;
 	
 	double jn,jt;
@@ -217,6 +200,7 @@ void Body::draw(sf::RenderWindow& screen)
 	sf::ConvexShape s;
 	int i=0;
 	s.setPointCount(pointList.size());
+	s.setFillColor(sf::Color(255,255,255,128));
 	for (auto &p : pointList)
 	{
 		s.setPoint(i,sf::Vector2f(p.x,p.y));

@@ -16,7 +16,7 @@ class Body
 	public:
 		Body();
 		AABB getAABB();
-		Collision isColliding(Body& other);
+		std::vector<Collision> isColliding(Body& other);
 
 		void addPoint(Vecteur v);
 		void setPosition(Vecteur p);
