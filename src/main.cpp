@@ -53,6 +53,7 @@ int main(int argc, const char *argv[])
 		sf::ContextSettings settings;
 		settings.antialiasingLevel = 4;
 		screen.create(sf::VideoMode(800,600),"--Parallel--",sf::Style::Default,settings);
+		//screen.setFramerateLimit(60);
 
 		GameLevel gl;
 		gl.setScreen(screen);

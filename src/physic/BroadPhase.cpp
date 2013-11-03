@@ -84,8 +84,8 @@ BroadPhaseOuputInt BroadPhase::split(BroadPhaseInputInt b,AABB& box, int contrat
 		}
 		else
 		{
-			BroadPhaseOuputInt out1=split(input1,firstAABB,contrat*99/100);
-			BroadPhaseOuputInt out2=split(input2,secondAABB,contrat*99/100);
+			BroadPhaseOuputInt out1=split(input1,firstAABB,contrat*60/100);
+			BroadPhaseOuputInt out2=split(input2,secondAABB,contrat*60/100);
 
 			//firstAABB.draw(s);
 			//secondAABB.draw(s);

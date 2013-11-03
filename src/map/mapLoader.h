@@ -9,6 +9,7 @@
 #include <list>
 #include <SFML/Graphics.hpp>
 #include "../physic/Body.h"
+#include "tileMap.h"
 
 typedef std::vector<std::vector<Tile> > MapLayer;
 
@@ -18,6 +19,8 @@ class MapLoader
 		MapLoader(std::string file);
 		std::vector<MapLayer>& getLayerBackground();
 		std::vector<MapLayer>& getLayerForeground();
+		std::vector<TileMap>& getTileMapBackground();
+		std::vector<TileMap>& getTileMapForeground();
 		std::vector<Body>& getFixedBody();
 		void draw(MapLayer& layer,sf::RenderWindow& screen);
 
@@ -27,8 +30,11 @@ class MapLoader
 		void parseLayer(tinyxml2::XMLElement*);
 		void parseObjectGroup(tinyxml2::XMLElement*);
 		void parseFixedObject(tinyxml2::XMLElement*);
+		void mapLayerToTileMap(const MapLayer& input, std::vector<TileMap>& output);
 		std::vector<MapLayer> foregroundLayers;
 		std::vector<MapLayer> backgroundLayers;
+		std::vector<TileMap> foregroundTileMap;
+		std::vector<TileMap> backgroundTileMap;
 		std::vector<Body> fixedBody;
 		int currentId;
 		std::list<int> gidList;

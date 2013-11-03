@@ -33,6 +33,20 @@ MapLoader::MapLoader(string file)
 		}
 		node = node->NextSibling();
 	}
+	
+	// build TileMap
+	for(auto &layer : backgroundLayers)
+	{
+		vector<TileMap> t;
+		mapLayerToTileMap(layer,t);
+		backgroundTileMap.insert(backgroundTileMap.end(),t.begin(),t.end());	
+	}
+	for(auto &layer : foregroundLayers)
+	{
+		vector<TileMap> t;
+		mapLayerToTileMap(layer,t);
+		foregroundTileMap.insert(foregroundTileMap.end(),t.begin(),t.end());	
+	}
 }
 
 void MapLoader::parseMap(XMLElement* element)
@@ -343,4 +357,57 @@ void MapLoader::draw(MapLayer& layer,sf::RenderWindow& screen)
 vector<Body>& MapLoader::getFixedBody()
 {
 	return fixedBody;
+}
+vector<TileMap>& MapLoader::getTileMapBackground()
+{
+	return backgroundTileMap;
+}
+vector<TileMap>& MapLoader::getTileMapForeground()
+{
+	return foregroundTileMap;
+}
+void MapLoader::mapLayerToTileMap(const MapLayer& input, vector<TileMap>& output)
+{
+	int x=0;
+	int y=0;
+	for(auto &line : input)
+	{
+		x=0;
+		for(auto &c : line)
+		{
+			if (c.id!=0)
+			{
+				Texture* texture=idToImg[c.id];
+				vector<TileMap>::iterator it=output.begin();
+				TileMap* current;
+				for(;;)
+				{
+					if (it==output.end())
+					{
+						TileMap tilemap;
+						tilemap.setTexture(*texture);
+						output.push_back(tilemap);
+						current=&(output.back());
+						break;
+					}
+					else if (it->getTexture()==texture)
+					{
+						current=&(*it);
+						break;
+					}
+					else
+					{
+						it++;
+					}
+				}
+				vector<Vertex>& vertice = current->getVertices();
+				vertice.push_back(Vertex(Vector2f(x,y),Vector2f(32*c.tilesetX,32*c.tilesetY)));
+				vertice.push_back(Vertex(Vector2f(x+32,y),Vector2f(32*c.tilesetX+32,32*c.tilesetY)));
+				vertice.push_back(Vertex(Vector2f(x+32,y+32),Vector2f(32*c.tilesetX+32,32*c.tilesetY+32)));
+				vertice.push_back(Vertex(Vector2f(x,y+32),Vector2f(32*c.tilesetX,32*c.tilesetY+32)));
+			}
+			x+=32;
+		}
+		y+=32;
+	}
 }

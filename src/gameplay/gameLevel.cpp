@@ -172,16 +172,16 @@ void GameLevel::execute()
 void GameLevel::draw()
 {
 	screen->clear(Color(0,0,0));
-	vector<MapLayer>& background1 = map1->getLayerBackground();
+	vector<TileMap>& background1 = map1->getTileMapBackground();
 	for(auto &l : background1)
-		map1->draw(l,*screen);
+		screen->draw(l);
 	for(auto &it : collisionBody)
 		it.draw(*screen);
 	character1.draw(*screen);
 	character2.draw(*screen);
-	vector<MapLayer>& foreground1 = map1->getLayerForeground();
+	vector<TileMap>& foreground1 = map1->getTileMapForeground();
 	for(auto &l : foreground1)
-		map1->draw(l,*screen);
+		screen->draw(l);
 	screen->display();
 }
 
