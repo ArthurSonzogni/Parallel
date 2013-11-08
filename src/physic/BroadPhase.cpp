@@ -31,7 +31,7 @@ BroadPhase::BroadPhase(BroadPhaseInput& Input):
 	for(unsigned int i=0;i<input.size();++i)
 		selectorAll.push_back(i);
 
-	BroadPhaseOuputInt outputInt= split(selectorAll,allAABB,Input.size());
+	BroadPhaseOutputInt outputInt= split(selectorAll,allAABB,Input.size());
 	
 	for(auto &group : outputInt)
 	{
@@ -39,23 +39,24 @@ BroadPhase::BroadPhase(BroadPhaseInput& Input):
 		{
 			for(auto other=element+1;other!=group.end();++other)
 			{
-				output.insert(pair<int,int>(*element,*other));
+				if (aabb[*element].intersect(aabb[*other]))
+					output.insert(pair<int,int>(*element,*other));
 			}
 		}
 	}
 }
 
 
-BroadPhaseOuputInt BroadPhase::split(BroadPhaseInputInt b,AABB& box, int contrat)
+BroadPhaseOutputInt BroadPhase::split(BroadPhaseInputInt b,AABB& box, int contrat)
 {
 	if (b.size()<=1)
 	{
-		BroadPhaseOuputInt r;
+		BroadPhaseOutputInt r;
 		return r;
 	}
 	else if (contrat==0)
 	{
-		BroadPhaseOuputInt r;
+		BroadPhaseOutputInt r;
 		r.push_back(b);
 		return r;
 	}
@@ -78,14 +79,14 @@ BroadPhaseOuputInt BroadPhase::split(BroadPhaseInputInt b,AABB& box, int contrat
 		int superflue=int(input1.size()+input2.size())-int(b.size());
 		if (superflue > contrat || superflue>=int(b.size()))
 		{
-			BroadPhaseOuputInt r;
+			BroadPhaseOutputInt r;
 			r.push_back(b);
 			return r;
 		}
 		else
 		{
-			BroadPhaseOuputInt out1=split(input1,firstAABB,contrat*60/100);
-			BroadPhaseOuputInt out2=split(input2,secondAABB,contrat*60/100);
+			BroadPhaseOutputInt out1=split(input1,firstAABB,contrat*60/100);
+			BroadPhaseOutputInt out2=split(input2,secondAABB,contrat*60/100);
 
 			//firstAABB.draw(s);
 			//secondAABB.draw(s);
@@ -97,7 +98,7 @@ BroadPhaseOuputInt BroadPhase::split(BroadPhaseInputInt b,AABB& box, int contrat
 	}
 }
 
-BroadPhaseOuput& BroadPhase::getOuput()
+BroadPhaseOutput& BroadPhase::getOutput()
 {
 	return output;
 }

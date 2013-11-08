@@ -75,10 +75,11 @@ void GameLevel::execute()
 	triangle.setMasse(0.50);
 	triangle.setInertia(100.0);
 
-	const float dx=150;
-	for(int ax=0;ax<3;++ax)
+	const float dx=75;
+	const int nn=6;
+	for(int ax=0;ax<nn;++ax)
 	{
-		for(int ay=0;ay<3;++ay)
+		for(int ay=0;ay<nn;++ay)
 		{
 			if ( (ax+ay*13) % 5 ==0)
 			{
@@ -167,7 +168,11 @@ void GameLevel::execute()
 
 			BroadPhase bp1(allBodyRef1);
 			BroadPhase bp2(allBodyRef2);
-			for(auto &a : bp1.getOuput())
+
+			cout<<"bp1.getOutput()="<<bp1.getOutput().size()<<endl;
+			cout<<"bp2.getOutput()="<<bp2.getOutput().size()<<endl;
+
+			for(auto &a : bp1.getOutput())
 			{
 				auto &v = allBodyRef1; // alias
 				vector<Collision> ca=v[a.first]->isColliding(*v[a.second]);
@@ -183,7 +188,7 @@ void GameLevel::execute()
 					v[a.second]->addCollisionImpulse(*v[a.first],collision);
 				}
 			}
-			for(auto &a : bp2.getOuput())
+			for(auto &a : bp2.getOutput())
 			{
 				auto &v = allBodyRef2; // alias
 				vector<Collision> ca=v[a.first]->isColliding(*v[a.second]);

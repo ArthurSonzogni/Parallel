@@ -9,22 +9,22 @@
 
 using BroadPhaseInput = std::vector<Body*>;
 using BroadPhaseInputInt = std::vector<int>;
-using BroadPhaseOuputInt = std::vector<std::vector<int> >;
-using BroadPhaseOuput = std::set<std::pair<int,int> >;
+using BroadPhaseOutputInt = std::vector<std::vector<int> >;
+using BroadPhaseOutput = std::set<std::pair<int,int> >;
 
 class BroadPhase
 {
 	public:
 		//BroadPhase(BroadPhaseInput& input,sf::RenderWindow& screen);
 		BroadPhase(BroadPhaseInput& input);
-		BroadPhaseOuput& getOuput();
+		BroadPhaseOutput& getOutput();
 	private:
 		//sf::RenderWindow& s;
 		BroadPhaseInput input;
-		BroadPhaseOuput output;
+		BroadPhaseOutput output;
 		std::vector<AABB> aabb;
 
-		BroadPhaseOuputInt split(BroadPhaseInputInt b,AABB& box, int contrat);
+		BroadPhaseOutputInt split(BroadPhaseInputInt b,AABB& box, int contrat);
 };
 
 
