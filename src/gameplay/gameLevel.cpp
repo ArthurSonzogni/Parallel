@@ -31,7 +31,7 @@ void GameLevel::setScreen(sf::RenderWindow& s)
 	view1.setSize(Vector2f(s.getSize().x,s.getSize().y*0.5));			
 	view2.setSize(Vector2f(s.getSize().x,s.getSize().y*0.5));			
 	view1.setViewport(FloatRect(0,0,1,0.5));
-	view2.setViewport(FloatRect(0,0.5,1,1));
+	view2.setViewport(FloatRect(0,0.5,1,0.5));
 }
 
 void GameLevel::setMap1(std::string m)
@@ -139,6 +139,8 @@ void GameLevel::execute()
 
 		if (Keyboard::isKeyPressed(Keyboard::Up))
 			character1.addImpulse(Vecteur(0.0,-50.0));
+		if (Keyboard::isKeyPressed(Keyboard::Up))
+			character2.addImpulse(Vecteur(0.0,-50.0));
 		
 
 
@@ -213,14 +215,8 @@ void GameLevel::execute()
 
 void GameLevel::draw()
 {
-	screen->clear(Color(0,0,0));
-
-	static int j=0;
-	static int i=0;
-	if (j++%20==0)
-	i++;
+	//screen->clear(Color(0,0,0));
 	// vue 1
-	//if(i%2==0)
 	{
 		screen->setView(view1);
 		vector<TileMap>& background = map1->getTileMapBackground();
@@ -234,7 +230,6 @@ void GameLevel::draw()
 			screen->draw(l);
 	}
 	// vue 2
-	//if(i%2==1)
 	{
 		screen->setView(view2);
 		vector<TileMap>& background = map2->getTileMapBackground();
