@@ -18,10 +18,15 @@ class GameLevel
 	private:
 		MapLoader* map1;
 		MapLoader* map2;
+		sf::View view1;
+		sf::View view2;
+		Body character1;
+		Body character2;
 		sf::RenderWindow* screen;
-		Body character1,character2;
-		std::vector<Body> collisionBody;
-		std::vector<Body*> allBodyRef;
+		std::vector<Body> collisionBody1;
+		std::vector<Body> collisionBody2;
+		std::vector<Body*> allBodyRef1;
+		std::vector<Body*> allBodyRef2;
 		void draw();
 };
 
