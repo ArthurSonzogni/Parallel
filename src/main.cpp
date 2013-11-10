@@ -51,7 +51,7 @@ int main(int argc, const char *argv[])
 	{
 		sf::RenderWindow screen;
 		sf::ContextSettings settings;
-		settings.antialiasingLevel = 4;
+		settings.antialiasingLevel = 8;
 		screen.create(sf::VideoMode(800,600),"--Parallel--",sf::Style::Default,settings);
 		//screen.setFramerateLimit(60);
 

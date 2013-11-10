@@ -28,6 +28,9 @@ class GameLevel
 		std::vector<Body*> allBodyRef1;
 		std::vector<Body*> allBodyRef2;
 		void draw();
+		void resetViews();
+		void updateViewCenter();
+		float view1x, view1y, view2x, view2y;
 };
 
 #endif /* end of include guard: GAMELEVEL_ZBGFUVNO */

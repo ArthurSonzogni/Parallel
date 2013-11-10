@@ -10,6 +10,7 @@ sf::Texture& getTexture(std::string& s)
 	if (it==imageContainer.end())
 	{
 		imageContainer[s].loadFromFile(s);
+		imageContainer[s].setSmooth(true);
 		return imageContainer[s];
 	}
 	else

@@ -19,8 +19,8 @@ bool equalZero(Vecteur d)
 }
 
 Body::Body():
-	group(0),
-	collisionGroup(0),
+	group(GROUP_ALL),
+	collisionGroup(GROUP_ALL),
 	restitution(0.5),
 	friction(0.1),
 	position(0.0,0.0),
@@ -28,7 +28,8 @@ Body::Body():
 	invMass(0.0),
 	angle(0.0),
 	angularSpeed(0.0),
-	invInertia(0.0)
+	invInertia(0.0),
+	collisionPreviousStep(false)
 {
 	
 }
@@ -114,9 +115,15 @@ void Body::setPosition(Vecteur p)
 
 void Body::addCollisionImpulse(Body& other,Collision& c)
 {
+	if (((group)&(other.collisionGroup)) == 0) return;
+	if (((other.group)&(collisionGroup)) == 0) return;
+
+
 	// the two objects aren't movable
 	if (invMass+other.invMass < minWeight) return; 
 	
+	collisionPreviousStep = true;
+	other.collisionPreviousStep = true;
 	
 	Vecteur r0= c.position - position;
 	Vecteur r1= c.position - other.position;
@@ -199,9 +206,14 @@ void Body::applyTime(double t)
 	else position = position + t*speed;
 
 	if (equalZero(angularSpeed)) angularSpeed=0.0;
-	else angle = angle + t*angularSpeed;
+	else
+	{
+		angle = angle + t*angularSpeed;
+		updateOrientation();
+	}
 
-	updateOrientation();
+	// reset
+	collisionPreviousStep = false;
 }
 
 void Body::updateOrientation()
@@ -214,7 +226,10 @@ void Body::draw(sf::RenderWindow& screen)
 	sf::ConvexShape s;
 	int i=0;
 	s.setPointCount(pointList.size());
-	s.setFillColor(sf::Color(255,255,255,128));
+	if (collisionPreviousStep)
+		s.setFillColor(sf::Color(255,255,255,128));
+	else
+		s.setFillColor(sf::Color(0,0,0,128));
 	for (auto &p : pointList)
 	{
 		s.setPoint(i,sf::Vector2f(p.x,p.y));
@@ -290,4 +305,33 @@ void Body::reoriente()
 		reverse(pointList.begin(),pointList.end());
 		cout<<"je reverse"<<endl;
 	}
+}
+
+void Body::recenter()
+{
+	double A = 0.0;
+	double Cx = 0.0;
+	double Cy = 0.0;
+	int n = pointList.size()-1;
+	int i;
+	for(i=0;i<n;++i)
+	{
+		double f=pointList[i].x * pointList[i+1].y - pointList[i+1].x * pointList[i].y;
+		A+=f;
+		Cx+=f*(pointList[i].x+pointList[i+1].x);
+		Cy+=f*(pointList[i].y+pointList[i+1].y);
+	}
+	Cx/=3.0*A;
+	Cy/=3.0*A;
+	Vecteur p(Cx,Cy);
+	n++;
+	for(i=0;i<n;++i)
+		pointList[i]=pointList[i]-p;
+	position=position+p;
+}
+
+void Body::setGroup(int g,int c)
+{
+	group=g;
+	collisionGroup=c;
 }

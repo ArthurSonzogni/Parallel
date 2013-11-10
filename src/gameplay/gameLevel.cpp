@@ -26,10 +26,12 @@ GameLevel::~GameLevel()
 void GameLevel::setScreen(sf::RenderWindow& s)
 {
 	screen=&s;
-	view1.setCenter(Vector2f(s.getSize().x*0.5,s.getSize().y*0.25));
-	view2.setCenter(Vector2f(s.getSize().x*0.5,s.getSize().y*0.25));
-	view1.setSize(Vector2f(s.getSize().x,s.getSize().y*0.5));			
-	view2.setSize(Vector2f(s.getSize().x,s.getSize().y*0.5));			
+	resetViews();
+}
+void GameLevel::resetViews()
+{
+	view1.setSize(Vector2f(screen->getSize().x,screen->getSize().y*0.5));			
+	view2.setSize(Vector2f(screen->getSize().x,screen->getSize().y*0.5));			
 	view1.setViewport(FloatRect(0,0,1,0.5));
 	view2.setViewport(FloatRect(0,0.5,1,0.5));
 }
@@ -62,45 +64,17 @@ void GameLevel::execute()
 	character1.addPoint(Vecteur(-32.0,-48.0));
 	character1.setMasse(0.50);
 	character1.setInertia(0.0);
+	character1.recenter();
 	character1.setPosition(Vecteur(400.0,0.0));
+	character1.setGroup(GROUP_CHARACTER1,GROUP_STATIC);
 
 	character2 = character1;
 	character2.setPosition(Vecteur(400,-200));
 
-	Body triangle;
-	for(float t=0;t<=6.28;t+=6.28/16.0)
-	{
-		triangle.addPoint(Vecteur(30.0*cos(t),30.0*sin(t)));
-	}
-	triangle.setMasse(0.50);
-	triangle.setInertia(100.0);
-
-	const float dx=75;
-	const int nn=6;
-	for(int ax=0;ax<nn;++ax)
-	{
-		for(int ay=0;ay<nn;++ay)
-		{
-			if ( (ax+ay*13) % 5 ==0)
-			{
-				collisionBody1.push_back(character1);
-				collisionBody1.back().setPosition(Vecteur(dx+ax*dx,dx+ay*dx));
-				collisionBody1.back().setMasse(0.50);
-				collisionBody1.back().setInertia(500.0);
-			}
-			else
-			{
-				collisionBody2.push_back(triangle);
-				collisionBody2.back().setPosition(Vecteur(dx+ax*dx,dx+ay*dx));
-				collisionBody2.back().setMasse(0.50);
-				collisionBody2.back().setInertia(500.0);
-			}
-		}
-	}
-	
 	
 	allBodyRef1.push_back(&character1);
 	allBodyRef2.push_back(&character2);
+
 	for(auto &it : collisionBody1)
 	{
 		allBodyRef1.push_back(&it);
@@ -118,10 +92,15 @@ void GameLevel::execute()
 	{
 		// event
 		Event event;
-		while(screen->pollEvent(event));
+		while(screen->pollEvent(event))
+		{
+			if (event.type == sf::Event::Resized)			
+				resetViews();
+		}
 
 		Vecteur v1=character1.getSpeed();
 		Vecteur v2=character2.getSpeed();
+
 		if (Keyboard::isKeyPressed(Keyboard::Right))
 		{
 			if (v1.x<256.0)
@@ -177,8 +156,7 @@ void GameLevel::execute()
 				auto &v = allBodyRef1; // alias
 				vector<Collision> ca=v[a.first]->isColliding(*v[a.second]);
 				vector<Collision> cb=v[a.second]->isColliding(*v[a.first]);
-				Collision cca=add(ca);
-				Collision ccb=add(cb);
+
 				for(auto &collision : ca)
 				{
 					v[a.first]->addCollisionImpulse(*v[a.second],collision);
@@ -193,8 +171,6 @@ void GameLevel::execute()
 				auto &v = allBodyRef2; // alias
 				vector<Collision> ca=v[a.first]->isColliding(*v[a.second]);
 				vector<Collision> cb=v[a.second]->isColliding(*v[a.first]);
-				Collision cca=add(ca);
-				Collision ccb=add(cb);
 				for(auto &collision : ca)
 				{
 					v[a.first]->addCollisionImpulse(*v[a.second],collision);
@@ -220,7 +196,9 @@ void GameLevel::execute()
 
 void GameLevel::draw()
 {
-	//screen->clear(Color(0,0,0));
+	updateViewCenter();
+
+	screen->clear(Color(0,0,0));
 	// vue 1
 	{
 		screen->setView(view1);
@@ -249,3 +227,25 @@ void GameLevel::draw()
 	}
 }
 
+
+void viewdiff(float& current, float &target)
+{
+	float d=target-current;
+	if (d<-1.0 or d>1.0)
+		current+=d*0.1;
+}
+void GameLevel::updateViewCenter()
+{
+	Vecteur v1=character1.getPosition();
+	Vecteur v2=character2.getPosition();
+	float x1=v1.x;
+	float y1=v1.y;
+	float x2=v2.x;
+	float y2=v2.y;
+	viewdiff(view1x,x1);
+	viewdiff(view1y,y1);
+	viewdiff(view2x,x2);
+	viewdiff(view2y,y2);
+	view1.setCenter(Vector2f(int(view1x),int(view1y)));
+	view2.setCenter(Vector2f(int(view2x),int(view2y)));
+}

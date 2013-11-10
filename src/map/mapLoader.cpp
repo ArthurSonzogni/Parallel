@@ -284,6 +284,8 @@ void MapLoader::parseFixedObject(tinyxml2::XMLElement* element)
 											if (v=='\0')
 											{
 												body.reoriente();
+												body.recenter();
+												body.setGroup(GROUP_STATIC,GROUP_CHARACTER);
 												fixedBody.push_back(body);
 												cout<<"ajout"<<endl;
 												break;
@@ -401,10 +403,14 @@ void MapLoader::mapLayerToTileMap(const MapLayer& input, vector<TileMap>& output
 					}
 				}
 				vector<Vertex>& vertice = current->getVertices();
-				vertice.push_back(Vertex(Vector2f(x,y),Vector2f(32*c.tilesetX,32*c.tilesetY)));
-				vertice.push_back(Vertex(Vector2f(x+32,y),Vector2f(32*c.tilesetX+32,32*c.tilesetY)));
-				vertice.push_back(Vertex(Vector2f(x+32,y+32),Vector2f(32*c.tilesetX+32,32*c.tilesetY+32)));
-				vertice.push_back(Vertex(Vector2f(x,y+32),Vector2f(32*c.tilesetX,32*c.tilesetY+32)));
+				float X=x;
+				float Y=y;
+				float tx=c.tilesetX;
+				float ty=c.tilesetY;
+				vertice.push_back(Vertex(Vector2f(X,Y),Vector2f(32.0*tx,32.0*ty)));
+				vertice.push_back(Vertex(Vector2f(X+32.0,Y),Vector2f(32.0*tx+32.0,32.0*ty)));
+				vertice.push_back(Vertex(Vector2f(X+32.0,Y+32.0),Vector2f(32.0*tx+32.0,32.0*ty+32.0)));
+				vertice.push_back(Vertex(Vector2f(X,Y+32.0),Vector2f(32.0*tx,32.0*ty+32.0)));
 			}
 			x+=32;
 		}

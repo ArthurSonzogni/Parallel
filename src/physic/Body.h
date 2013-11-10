@@ -10,6 +10,13 @@
 class AABB;
 class Collision;
 
+#define GROUP_STATIC		0b1000000
+#define GROUP_CHARACTER1	0b0100000
+#define GROUP_CHARACTER2	0b0010000
+
+#define GROUP_CHARACTER GROUP_CHARACTER1|GROUP_CHARACTER2
+#define GROUP_ALL		GROUP_CHARACTER1|GROUP_CHARACTER2|GROUP_STATIC
+
 // Body as a convexe polygon.
 class Body
 {
@@ -34,8 +41,11 @@ class Body
 		void setRestitution(double r);
 		void setFriction(double f);
 		bool isLinearStatic();
+		void recenter();
 		
 		void reoriente();
+		void isCollisionPreviousStep();
+		void setGroup(int g,int c);
 	private:
 		
 		int group;
@@ -54,7 +64,7 @@ class Body
 		double  invInertia;
 		void updateOrientation();
 
-
+		bool collisionPreviousStep;
 };
 
 #endif /* end of include guard: BODY_P1BCP0FY */
