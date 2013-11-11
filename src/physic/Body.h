@@ -11,11 +11,14 @@ class AABB;
 class Collision;
 
 #define GROUP_STATIC		0b1000000
-#define GROUP_CHARACTER1	0b0100000
-#define GROUP_CHARACTER2	0b0010000
+#define GROUP_CHARACTER		0b0100000
+#define GROUP_JUMPDETECTOR	0b0010000
 
-#define GROUP_CHARACTER GROUP_CHARACTER1|GROUP_CHARACTER2
-#define GROUP_ALL		GROUP_CHARACTER1|GROUP_CHARACTER2|GROUP_STATIC
+#define GROUP_ALL			0b1111111
+
+#define GROUP_COLLISION_STATIC			GROUP_JUMPDETECTOR|GROUP_CHARACTER
+#define GROUP_COLLISION_CHARACTER		GROUP_STATIC
+#define GROUP_COLLISION_JUMPDETECTOR	GROUP_STATIC
 
 // Body as a convexe polygon.
 class Body
@@ -34,6 +37,7 @@ class Body
 		void setAngle(double angle);
 		void setSpeed(Vecteur speed);
 		Vecteur getSpeed();
+		void addAcceleration(Vecteur a);
 		void addImpulse(Vecteur impulse);
 		void addTorque(double torque);
 		void setMasse(double mass);
@@ -44,7 +48,7 @@ class Body
 		void recenter();
 		
 		void reoriente();
-		void isCollisionPreviousStep();
+		bool isCollisionPreviousStep();
 		void setGroup(int g,int c);
 	private:
 		
@@ -56,6 +60,7 @@ class Body
 
 		Vecteur position;
 		Vecteur speed;
+		Vecteur acceleration;
 		double invMass;
 
 		Matrix	orientation;

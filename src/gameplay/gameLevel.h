@@ -5,6 +5,7 @@
 #include "../map/mapLoader.h"
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include "character.h"
 
 class GameLevel
 {
@@ -20,8 +21,8 @@ class GameLevel
 		MapLoader* map2;
 		sf::View view1;
 		sf::View view2;
-		Body character1;
-		Body character2;
+		Character character1;
+		Character character2;
 		sf::RenderWindow* screen;
 		std::vector<Body> collisionBody1;
 		std::vector<Body> collisionBody2;

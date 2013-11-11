@@ -25,6 +25,7 @@ Body::Body():
 	friction(0.1),
 	position(0.0,0.0),
 	speed(0.0,0.0),
+	acceleration(0.0,0.0),
 	invMass(0.0),
 	angle(0.0),
 	angularSpeed(0.0),
@@ -118,12 +119,12 @@ void Body::addCollisionImpulse(Body& other,Collision& c)
 	if (((group)&(other.collisionGroup)) == 0) return;
 	if (((other.group)&(collisionGroup)) == 0) return;
 
+	collisionPreviousStep = true;
+	other.collisionPreviousStep = true;
 
 	// the two objects aren't movable
 	if (invMass+other.invMass < minWeight) return; 
 	
-	collisionPreviousStep = true;
-	other.collisionPreviousStep = true;
 	
 	Vecteur r0= c.position - position;
 	Vecteur r1= c.position - other.position;
@@ -155,6 +156,11 @@ void Body::addCollisionImpulse(Body& other,Collision& c)
 		jn =  (-1.0 - e) * (dv*normal) / normDiv;
 
 		// bias impulse to force object to don't penetrate each other.
+		{
+			float bias=c.penetration;
+			addAcceleration( (invMass*bias) * normal);		
+			other.addAcceleration((-other.invMass*bias)*normal);
+		}
 		jn+=(c.penetration*1.5);
 		
 		addImpulse( (invMass*jn) * normal);		
@@ -199,6 +205,14 @@ void Body::addCollisionImpulse(Body& other,Collision& c)
 
 void Body::applyTime(double t)
 {
+	if (collisionPreviousStep)
+	{
+		collisionPreviousStep = false;
+		speed = speed + acceleration;
+		acceleration = 0.2 * acceleration;
+	}
+	else acceleration=Vecteur(0.0,0.0);
+
 	speed=0.9999*speed;
 	angularSpeed*=0.999999;
 
@@ -212,8 +226,6 @@ void Body::applyTime(double t)
 		updateOrientation();
 	}
 
-	// reset
-	collisionPreviousStep = false;
 }
 
 void Body::updateOrientation()
@@ -250,6 +262,11 @@ void Body::setAngle(double Angle)
 void Body::setSpeed(Vecteur Speed)
 {
 	speed=Speed;
+}
+
+void Body::addAcceleration(Vecteur a)
+{
+	acceleration = acceleration + a;
 }
 void Body::addImpulse(Vecteur impulse)
 {
@@ -334,4 +351,9 @@ void Body::setGroup(int g,int c)
 {
 	group=g;
 	collisionGroup=c;
+}
+
+bool Body::isCollisionPreviousStep()
+{
+	return collisionPreviousStep;
 }

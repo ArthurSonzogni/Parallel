@@ -54,26 +54,17 @@ void GameLevel::execute()
 	collisionBody1.insert(collisionBody1.end(),map1->getFixedBody().begin(),map1->getFixedBody().end());
 	collisionBody2.insert(collisionBody2.end(),map2->getFixedBody().begin(),map2->getFixedBody().end());
 
-	character1.addPoint(Vecteur(-16.0,-64.0));
-	character1.addPoint(Vecteur(+16.0,-64.0));
-	character1.addPoint(Vecteur(+32.0,-48.0));
-	character1.addPoint(Vecteur(+32.0,+48.0));
-	character1.addPoint(Vecteur(+16.0,+64.0));
-	character1.addPoint(Vecteur(-16.0,+64.0));
-	character1.addPoint(Vecteur(-32.0,+48.0));
-	character1.addPoint(Vecteur(-32.0,-48.0));
-	character1.setMasse(0.50);
-	character1.setInertia(0.0);
-	character1.recenter();
-	character1.setPosition(Vecteur(400.0,0.0));
-	character1.setGroup(GROUP_CHARACTER1,GROUP_STATIC);
-
-	character2 = character1;
-	character2.setPosition(Vecteur(400,-200));
-
+		
 	
-	allBodyRef1.push_back(&character1);
-	allBodyRef2.push_back(&character2);
+	{
+		auto v1 = character1.getAllBodyRef();
+		auto v2 = character2.getAllBodyRef();
+		allBodyRef1.insert(allBodyRef1.end(),v1.begin(),v1.end());
+		allBodyRef2.insert(allBodyRef2.end(),v2.begin(),v2.end());
+	}
+
+	character1.setPosition(Vecteur(200,0));
+	character2.setPosition(Vecteur(200,0));
 
 	for(auto &it : collisionBody1)
 	{
@@ -98,46 +89,41 @@ void GameLevel::execute()
 				resetViews();
 		}
 
-		Vecteur v1=character1.getSpeed();
-		Vecteur v2=character2.getSpeed();
+		if (Keyboard::isKeyPressed(Keyboard::Left))
+		{
+			character1.keyLeft();
+			character2.keyLeft();
+		}
 
 		if (Keyboard::isKeyPressed(Keyboard::Right))
 		{
-			if (v1.x<256.0)
-				character1.addImpulse(Vecteur(30.0,0.0));
-			if (v2.x<256.0)
-				character2.addImpulse(Vecteur(30.0,0.0));
+			character1.keyRight();
+			character2.keyRight();
 		}
 
-		if (Keyboard::isKeyPressed(Keyboard::Left))
+		if (Keyboard::isKeyPressed(Keyboard::Up))
 		{
-			if (v1.x>-256.0)
-				character1.addImpulse(Vecteur(-30.0,0.0));
-			if (v2.x>-256.0)
-				character2.addImpulse(Vecteur(-30.0,0.0));
+			character1.keyUp();
+			character2.keyUp();
 		}
-
-		if (Keyboard::isKeyPressed(Keyboard::Up))
-			character1.addImpulse(Vecteur(0.0,-50.0));
-		if (Keyboard::isKeyPressed(Keyboard::Up))
-			character2.addImpulse(Vecteur(0.0,-50.0));
 		
-
+		character1.step();
+		character2.step();
 
 		// physic
 		for(auto &it : allBodyRef1)
 		{
 			if (not it->isLinearStatic())
-				it->addImpulse(Vecteur(0.0,10.0));
+				it->addImpulse(Vecteur(0.0,20.0));
 		}
 		for(auto &it : allBodyRef2)
 		{
 			if (not it->isLinearStatic())
-				it->addImpulse(Vecteur(0.0,10.0));
+				it->addImpulse(Vecteur(0.0,20.0));
 		}
 
 		draw();
-		const float detail=2;
+		const float detail=1;
 		for(int i=0;i<detail;++i)
 		{
 			for(auto &it : allBodyRef1)

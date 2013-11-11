@@ -285,7 +285,7 @@ void MapLoader::parseFixedObject(tinyxml2::XMLElement* element)
 											{
 												body.reoriente();
 												body.recenter();
-												body.setGroup(GROUP_STATIC,GROUP_CHARACTER);
+												body.setGroup(GROUP_STATIC,GROUP_COLLISION_STATIC);
 												fixedBody.push_back(body);
 												cout<<"ajout"<<endl;
 												break;
