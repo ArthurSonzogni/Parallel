@@ -30,8 +30,9 @@ void GameLevel::setScreen(sf::RenderWindow& s)
 }
 void GameLevel::resetViews()
 {
-	view1.setSize(Vector2f(screen->getSize().x,screen->getSize().y*0.5));			
-	view2.setSize(Vector2f(screen->getSize().x,screen->getSize().y*0.5));			
+	float zoom=1.0;
+	view1.setSize(Vector2f(screen->getSize().x*zoom,screen->getSize().y*0.5*zoom));			
+	view2.setSize(Vector2f(screen->getSize().x*zoom,screen->getSize().y*0.5*zoom));			
 	view1.setViewport(FloatRect(0,0,1,0.5));
 	view2.setViewport(FloatRect(0,0.5,1,0.5));
 }
@@ -53,15 +54,19 @@ void GameLevel::execute()
 	// ajout des objets fixes.
 	collisionBody1.insert(collisionBody1.end(),map1->getFixedBody().begin(),map1->getFixedBody().end());
 	collisionBody2.insert(collisionBody2.end(),map2->getFixedBody().begin(),map2->getFixedBody().end());
-
+	
+	// ajout des objets
+	allObject1.insert(allObject1.end(),map1->getObject().begin(),map1->getObject().end());
+	allObject2.insert(allObject2.end(),map2->getObject().begin(),map2->getObject().end());
 		
 	
 	{
-		auto v1 = character1.getAllBodyRef();
-		auto v2 = character2.getAllBodyRef();
+		auto v1 = character1.getBodies();
+		auto v2 = character2.getBodies();
 		allBodyRef1.insert(allBodyRef1.end(),v1.begin(),v1.end());
 		allBodyRef2.insert(allBodyRef2.end(),v2.begin(),v2.end());
 	}
+
 
 	character1.setPosition(Vecteur(200,0));
 	character2.setPosition(Vecteur(200,0));
@@ -134,8 +139,8 @@ void GameLevel::execute()
 			BroadPhase bp1(allBodyRef1);
 			BroadPhase bp2(allBodyRef2);
 
-			cout<<"bp1.getOutput()="<<bp1.getOutput().size()<<endl;
-			cout<<"bp2.getOutput()="<<bp2.getOutput().size()<<endl;
+			//cout<<"bp1.getOutput()="<<bp1.getOutput().size()<<endl;
+			//cout<<"bp2.getOutput()="<<bp2.getOutput().size()<<endl;
 
 			for(auto &a : bp1.getOutput())
 			{
@@ -191,8 +196,10 @@ void GameLevel::draw()
 		vector<TileMap>& background = map1->getTileMapBackground();
 		for(auto &l : background)
 			screen->draw(l);
-		for(auto &it : collisionBody1)
-			it.draw(*screen);
+		//for(auto &it : collisionBody1)
+			//it.draw(*screen);
+		for(auto &l : allObject1)
+			l->draw(*screen);
 		character1.draw(*screen);
 		vector<TileMap>& foreground = map1->getTileMapForeground();
 		for(auto &l : foreground)
@@ -204,8 +211,10 @@ void GameLevel::draw()
 		vector<TileMap>& background = map2->getTileMapBackground();
 		for(auto &l : background)
 			screen->draw(l);
-		for(auto &it : collisionBody2)
-			it.draw(*screen);
+		//for(auto &it : collisionBody2)
+			//it.draw(*screen);
+		for(auto &l : allObject2)
+			l->draw(*screen);
 		character2.draw(*screen);
 		vector<TileMap>& foreground = map2->getTileMapForeground();
 		for(auto &l : foreground)

@@ -6,6 +6,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "character.h"
+#include "object.h"
 
 class GameLevel
 {
@@ -28,6 +29,8 @@ class GameLevel
 		std::vector<Body> collisionBody2;
 		std::vector<Body*> allBodyRef1;
 		std::vector<Body*> allBodyRef2;
+		std::vector<Object*> allObject1;
+		std::vector<Object*> allObject2;
 		void draw();
 		void resetViews();
 		void updateViewCenter();

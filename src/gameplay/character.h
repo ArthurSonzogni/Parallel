@@ -3,13 +3,14 @@
 
 #include "../physic/Body.h"
 #include <vector>
+#include "object.h"
 
-class Character
+class Character : public Object
 {
 	public:
 		Character();
 		void draw(sf::RenderWindow& screen);
-		std::vector<Body*> getAllBodyRef();
+		std::vector<Body*> getBodies();
 		void setPosition(Vecteur p);
 		Vecteur getPosition();
 		void keyLeft();

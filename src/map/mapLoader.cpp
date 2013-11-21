@@ -2,6 +2,7 @@
 #include "../ressource/manager.h"
 #include <iostream>
 #include <exception>
+#include "../gameplay/blockSpider.h"
 
 using namespace std;
 using namespace sf;
@@ -212,11 +213,53 @@ void MapLoader::parseObjectGroup(tinyxml2::XMLElement* element)
 	const char* tilesetName=element->Attribute("name");
 	if (tilesetName)
 	{
+		cout<<"1"<<endl;
 		if (string("fixed")==tilesetName)
 			parseFixedObject(element);
+		else if (string("objets")==tilesetName)
+			parseObject(element);
 	}
 }
 
+void MapLoader::parseObject(tinyxml2::XMLElement* element)
+{
+	cout<<"2"<<endl;
+	XMLNode* node=element->FirstChild();
+	while(node)
+	{
+		cout<<"3"<<endl;
+		XMLElement* element=node->ToElement();
+		if (element)
+		{
+			cout<<"4"<<endl;
+			string value=element->Value();
+			if (value=="object")
+			{
+				cout<<"5"<<endl;
+				int x,y,width,height;
+				int returnX = element->QueryIntAttribute("x",&x);
+				int returnY = element->QueryIntAttribute("y",&y);
+				int returnW = element->QueryIntAttribute("width",&width);
+				int returnH = element->QueryIntAttribute("height",&height);
+				const char* type = element->Attribute("type");
+				if (type && strcmp(type,"blockSpider")==0)
+				{
+					cout<<"6"<<endl;
+					if (	(returnX==XML_NO_ERROR) &&
+							(returnY==XML_NO_ERROR) &&
+							(returnW==XML_NO_ERROR) &&
+							(returnH==XML_NO_ERROR))
+					{
+						cout<<"7"<<endl;
+						BlockSpider* b=new BlockSpider(x,y,width,height);
+						object.push_back(b);
+					}
+				}
+			}
+		}
+		node = node->NextSibling();
+	}
+}
 void MapLoader::parseFixedObject(tinyxml2::XMLElement* element)
 {
 	XMLNode* node=element->FirstChild();
@@ -416,4 +459,10 @@ void MapLoader::mapLayerToTileMap(const MapLayer& input, vector<TileMap>& output
 		}
 		y+=32;
 	}
+}
+
+
+vector<Object*>& MapLoader::getObject()
+{
+	return object;
 }

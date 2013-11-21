@@ -57,7 +57,7 @@ int main(int argc, const char *argv[])
 
 		GameLevel gl;
 		gl.setScreen(screen);
-		gl.setMap1("level/essai.tmx");
+		gl.setMap1("level/level1.tmx");
 		gl.setMap2("level/essai.tmx");
 		gl.execute();
 	}

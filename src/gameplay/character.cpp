@@ -6,14 +6,14 @@ using namespace sf;
 
 Character::Character()
 {
-	body.addPoint(Vecteur(-16.0,-64.0));
-	body.addPoint(Vecteur(+16.0,-64.0));
-	body.addPoint(Vecteur(+32.0,-48.0));
-	body.addPoint(Vecteur(+32.0,+48.0));
-	body.addPoint(Vecteur(+16.0,+64.0));
-	body.addPoint(Vecteur(-16.0,+64.0));
-	body.addPoint(Vecteur(-32.0,+48.0));
-	body.addPoint(Vecteur(-32.0,-48.0));
+	body.addPoint(Vecteur(-8.0,-32.0));
+	body.addPoint(Vecteur(+8.0,-32.0));
+	body.addPoint(Vecteur(+16.0,-24.0));
+	body.addPoint(Vecteur(+16.0,+24.0));
+	body.addPoint(Vecteur(+8.0,+32.0));
+	body.addPoint(Vecteur(-8.0,+32.0));
+	body.addPoint(Vecteur(-16.0,+24.0));
+	body.addPoint(Vecteur(-16.0,-24.0));
 	body.setMasse(0.50);
 	body.setInertia(0.0);
 	body.recenter();
@@ -21,9 +21,9 @@ Character::Character()
 	body.setRestitution(0.0);
 	body.setFriction(1.0);
 	
-	jumpDetector.addPoint(Vecteur(-16.0,-0.0));
-	jumpDetector.addPoint(Vecteur(+16.0,-0.0));
-	jumpDetector.addPoint(Vecteur(0.0,+1.0));
+	jumpDetector.addPoint(Vecteur(-8.0,-0.0));
+	jumpDetector.addPoint(Vecteur(+8.0,-0.0));
+	jumpDetector.addPoint(Vecteur(0.0,+0.5));
 	jumpDetector.setMasse(0.0);
 	jumpDetector.setInertia(0.0);
 	jumpDetector.recenter();
@@ -36,7 +36,7 @@ void Character::draw(sf::RenderWindow& screen)
 	body.draw(screen);
 }
 
-vector<Body*> Character::getAllBodyRef()
+vector<Body*> Character::getBodies()
 {
 	vector<Body*> v;
 	v.push_back(&body);
@@ -58,13 +58,13 @@ Vecteur Character::getPosition()
 void Character::keyLeft()
 {
 	if (body.getSpeed().x>-256.0)
-	if (jumpDetector.isCollisionPreviousStep())
+	//if (jumpDetector.isCollisionPreviousStep())
 		body.addImpulse(Vecteur(-30.0,0.0));
 }
 void Character::keyRight()
 {
 	if (body.getSpeed().x<256.0)
-	if (jumpDetector.isCollisionPreviousStep())
+	//if (jumpDetector.isCollisionPreviousStep())
 		body.addImpulse(Vecteur(30.0,0.0));
 }
 void Character::keyUp()
@@ -75,7 +75,7 @@ void Character::keyUp()
 
 void Character::jumpDetectorResetPosition()
 {
-	jumpDetector.setPosition(body.getPosition()+Vecteur(0.0,64.0+2.0));
+	jumpDetector.setPosition(body.getPosition()+Vecteur(0.0,32.0+1.0));
 }
 
 void Character::step()
